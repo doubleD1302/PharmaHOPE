@@ -1,0 +1,48 @@
+name: Build Hope iOS IPA
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      - name: Build Archive
+        run: |
+          xcodebuild archive \
+            -project Hope.xcodeproj \
+            -scheme Hope \
+            -configuration Release \
+            -archivePath build/Hope.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Package into IPA
+        run: |
+          mkdir -p Payload
+          cp -r build/Hope.xcarchive/Products/Applications/Hope.app Payload/
+          zip -r Hope.ipa Payload
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hope-iOS-IPA
+          path: Hope.ipa
+          retention-days: 14

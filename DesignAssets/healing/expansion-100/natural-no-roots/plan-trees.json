@@ -1,0 +1,95 @@
+{
+  "prompt_template": "ONE separate isolated natural healing garden sprite: SUBJECT. Natural outdoor botanical illustration, organic shapes, soft hand-painted pastel watercolor, no pot, no vase, no planter, no container, no exposed roots, no root system, no cutaway, no soil cross section, no mound of dirt, no ground slab. Plants end neatly at the base, ready to overlap a background. No text, no halo, no cast shadow, full silhouette, transparent background. For animals retain natural anatomy and no accessories.",
+  "items": [
+    {
+      "id": "031",
+      "category": "trees",
+      "subject": "young birch tree",
+      "file": "031-trees-young-birch-tree.png"
+    },
+    {
+      "id": "032",
+      "category": "trees",
+      "subject": "young oak tree",
+      "file": "032-trees-young-oak-tree.png"
+    },
+    {
+      "id": "033",
+      "category": "trees",
+      "subject": "young apple tree",
+      "file": "033-trees-young-apple-tree.png"
+    },
+    {
+      "id": "034",
+      "category": "trees",
+      "subject": "small magnolia tree",
+      "file": "034-trees-small-magnolia-tree.png"
+    },
+    {
+      "id": "035",
+      "category": "trees",
+      "subject": "young plum blossom tree",
+      "file": "035-trees-young-plum-blossom-tree.png"
+    },
+    {
+      "id": "036",
+      "category": "trees",
+      "subject": "young flowering cherry tree",
+      "file": "036-trees-young-flowering-cherry-tree.png"
+    },
+    {
+      "id": "037",
+      "category": "trees",
+      "subject": "young golden ginkgo tree",
+      "file": "037-trees-young-golden-ginkgo-tree.png"
+    },
+    {
+      "id": "038",
+      "category": "trees",
+      "subject": "young willow tree",
+      "file": "038-trees-young-willow-tree.png"
+    },
+    {
+      "id": "039",
+      "category": "trees",
+      "subject": "small olive tree",
+      "file": "039-trees-small-olive-tree.png"
+    },
+    {
+      "id": "040",
+      "category": "trees",
+      "subject": "small maple sapling",
+      "file": "040-trees-small-maple-sapling.png"
+    },
+    {
+      "id": "041",
+      "category": "trees",
+      "subject": "young fig tree",
+      "file": "041-trees-young-fig-tree.png"
+    },
+    {
+      "id": "042",
+      "category": "trees",
+      "subject": "small evergreen pine",
+      "file": "042-trees-small-evergreen-pine.png"
+    },
+    {
+      "id": "043",
+      "category": "trees",
+      "subject": "young bamboo grove",
+      "file": "043-trees-young-bamboo-grove.png"
+    },
+    {
+      "id": "044",
+      "category": "trees",
+      "subject": "small tree fern",
+      "file": "044-trees-small-tree-fern.png"
+    },
+    {
+      "id": "045",
+      "category": "trees",
+      "subject": "small elderberry shrub",
+      "file": "045-trees-small-elderberry-shrub.png"
+    }
+  ]
+}

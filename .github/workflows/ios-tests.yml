@@ -1,0 +1,69 @@
+name: Hope iOS Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ios-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      - name: Pick an iPhone Simulator
+        id: sim
+        run: |
+          # Lấy UDID của iPhone đầu tiên có sẵn, không phụ thuộc tên máy cụ thể.
+          UDID=$(xcrun simctl list devices available iPhone \
+            | grep -E "iPhone" | head -n 1 \
+            | grep -oE "[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}")
+          if [ -z "$UDID" ]; then
+            echo "Không tìm thấy iPhone Simulator nào" >&2
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "udid=$UDID" >> "$GITHUB_OUTPUT"
+          xcrun simctl boot "$UDID" || true
+
+      - name: Run HopeTests
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild test \
+            -project Hope.xcodeproj \
+            -scheme Hope \
+            -destination "id=${{ steps.sim.outputs.udid }}" \
+            -resultBundlePath build/HopeTests.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            | tee build/xcodebuild.log
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Hope-Test-Results
+          path: |
+            build/HopeTests.xcresult
+            build/xcodebuild.log
+          if-no-files-found: ignore
+          retention-days: 14

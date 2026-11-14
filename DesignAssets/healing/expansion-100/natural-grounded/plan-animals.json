@@ -1,0 +1,125 @@
+{
+  "prompt_template": "Create ONE individual isolated natural healing garden game asset: SUBJECT. Hand-painted soft pastel watercolor, organic natural appearance. For a plant or tree, show a small natural footing: a modest patch of grass, moss and earth surface around the base, with the plant visually emerging from it; roots stay hidden underground. The footing should be shallow and organic so it can blend into a vertically scrolling garden. For an animal or object, a small natural contact patch only when helpful. No pots, vases, containers, exposed roots, cutaway soil, artificial pedestal, text or unrelated objects. Entire asset including its small footing visible with margin; transparent outside the asset, clean silhouette, no halo.",
+  "items": [
+    {
+      "id": "046",
+      "category": "animals",
+      "subject": "small brown rabbit",
+      "file": "046-animals-small-brown-rabbit.png"
+    },
+    {
+      "id": "047",
+      "category": "animals",
+      "subject": "baby hedgehog",
+      "file": "047-animals-baby-hedgehog.png"
+    },
+    {
+      "id": "048",
+      "category": "animals",
+      "subject": "deer fawn",
+      "file": "048-animals-deer-fawn.png"
+    },
+    {
+      "id": "049",
+      "category": "animals",
+      "subject": "squirrel",
+      "file": "049-animals-squirrel.png"
+    },
+    {
+      "id": "050",
+      "category": "animals",
+      "subject": "robin bird",
+      "file": "050-animals-robin-bird.png"
+    },
+    {
+      "id": "051",
+      "category": "animals",
+      "subject": "sparrow perched on a twig",
+      "file": "051-animals-sparrow-perched-on-a-twig.png"
+    },
+    {
+      "id": "052",
+      "category": "animals",
+      "subject": "blue tit perched on a twig",
+      "file": "052-animals-blue-tit-perched-on-a-twig.png"
+    },
+    {
+      "id": "053",
+      "category": "animals",
+      "subject": "white butterfly",
+      "file": "053-animals-white-butterfly.png"
+    },
+    {
+      "id": "054",
+      "category": "animals",
+      "subject": "yellow butterfly",
+      "file": "054-animals-yellow-butterfly.png"
+    },
+    {
+      "id": "055",
+      "category": "animals",
+      "subject": "honey bee",
+      "file": "055-animals-honey-bee.png"
+    },
+    {
+      "id": "056",
+      "category": "animals",
+      "subject": "ladybug",
+      "file": "056-animals-ladybug.png"
+    },
+    {
+      "id": "057",
+      "category": "animals",
+      "subject": "small green frog",
+      "file": "057-animals-small-green-frog.png"
+    },
+    {
+      "id": "058",
+      "category": "animals",
+      "subject": "dragonfly",
+      "file": "058-animals-dragonfly.png"
+    },
+    {
+      "id": "059",
+      "category": "animals",
+      "subject": "small garden snail",
+      "file": "059-animals-small-garden-snail.png"
+    },
+    {
+      "id": "060",
+      "category": "animals",
+      "subject": "baby duckling",
+      "file": "060-animals-baby-duckling.png"
+    },
+    {
+      "id": "061",
+      "category": "animals",
+      "subject": "small songbird",
+      "file": "061-animals-small-songbird.png"
+    },
+    {
+      "id": "062",
+      "category": "animals",
+      "subject": "caterpillar",
+      "file": "062-animals-caterpillar.png"
+    },
+    {
+      "id": "063",
+      "category": "animals",
+      "subject": "small turtle",
+      "file": "063-animals-small-turtle.png"
+    },
+    {
+      "id": "064",
+      "category": "animals",
+      "subject": "small moth",
+      "file": "064-animals-small-moth.png"
+    },
+    {
+      "id": "065",
+      "category": "animals",
+      "subject": "baby fox",
+      "file": "065-animals-baby-fox.png"
+    }
+  ]
+}

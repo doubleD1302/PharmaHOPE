@@ -1,0 +1,330 @@
+{
+  "status": "candidate",
+  "count": 23,
+  "unique_sha256": 23,
+  "note": "Generated candidates. Alpha edge quality, consistency, animation and iOS behavior are not yet approved.",
+  "assets": [
+    {
+      "file": "101-nature-mossy-river-stone.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "0ebcba805f8ca7fdcc0600256951c434bd700aa9364c20c14c9733dad996ba5a",
+      "status": "candidate"
+    },
+    {
+      "file": "102-nature-smooth-oval-river-pebble.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "47169db7d8fa45d94b21e40f3060e1016dc31a652b60b924580be0cebf1c5430",
+      "status": "candidate"
+    },
+    {
+      "file": "103-nature-mossy-fallen-log.png",
+      "size": [
+        1774,
+        887
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "b15c8a1c61feb25e0a79e0dac6b99184276def2eeb1ba781c842a0c9e9022163",
+      "status": "candidate"
+    },
+    {
+      "file": "104-nature-small-forest-stump-with-moss.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "a9b8ae8132f16ba41a3baeb3d47d0a2cf7015289f5ab02258c85eb19b20f7a3e",
+      "status": "candidate"
+    },
+    {
+      "file": "105-nature-cluster-of-wild-mushrooms.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "aa1cf91008b0695e11d625d2319f56550154d8f78bfaeda694ba9a2cc74f04e0",
+      "status": "candidate"
+    },
+    {
+      "file": "106-nature-single-red-capped-woodland-mushroom.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "95aa1f69f6970f1323d0e335e61ace050243467d59dd399e8e83f54894111b01",
+      "status": "candidate"
+    },
+    {
+      "file": "107-nature-single-cream-woodland-mushroom.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "816dcceb5b88a49463318ddf5625f79d63e4dc4b2b4f55be5ed6b3c887d588aa",
+      "status": "candidate"
+    },
+    {
+      "file": "108-nature-soft-patch-of-forest-moss.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "b8e04748ea647b31e364b1c64b1d104c2ae98363276c7c51fbcd3dad467ad03d",
+      "status": "candidate"
+    },
+    {
+      "file": "109-nature-patch-of-clover-leaves.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "91a86ab320f34173c501769ec7f00e85b0fef6cb0907fd227a3183fe0f3abd74",
+      "status": "candidate"
+    },
+    {
+      "file": "110-nature-patch-of-wild-grass.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "ff023095063e40026bc23dcc11bd02962296273e0037bd5aee8b2bd07803ddc5",
+      "status": "candidate"
+    },
+    {
+      "file": "111-nature-small-willow-tree.png",
+      "size": [
+        1230,
+        1278
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "f33d0a167cfd22adc812a2549035ac21340760cf616114d8bb07026759521cb9",
+      "status": "candidate"
+    },
+    {
+      "file": "112-nature-young-cherry-blossom-tree.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "baff1367dea66d29cc21f40b0812c87b46b0bd47d49677a117b3f5cd8179d86c",
+      "status": "candidate"
+    },
+    {
+      "file": "113-nature-small-maple-tree.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "569906c5c1eba391047cbcbea9777eee8e03ba446efbfe9980ce9b6b224d7149",
+      "status": "candidate"
+    },
+    {
+      "file": "114-nature-tiny-pine-tree.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "bfc459b78e090b5a83e8e59d06af874d9d9621ed6b08970b6558c002a92cfd70",
+      "status": "candidate"
+    },
+    {
+      "file": "115-nature-fern-frond.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "64d6d4b2af5906b6461ba4a29bc862d6cb2cb22c1341dd1cc85c944aa930a616",
+      "status": "candidate"
+    },
+    {
+      "file": "116-nature-wildflower-meadow-patch.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "89e6eff156fa66dff1733b6b91410c197bf5284a1c182d38f07a18bf4b662068",
+      "status": "candidate"
+    },
+    {
+      "file": "117-nature-lotus-flower-and-leaf.png",
+      "size": [
+        1234,
+        1274
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "2517734e495e9802de34678c536471454bf7e26437aecb906d760cdbb884ce8a",
+      "status": "candidate"
+    },
+    {
+      "file": "118-nature-white-water-lily.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "4d37dc8c8a69b0244e3d7189f678ce958aac46b8c82e60bd6826e181a24115cf",
+      "status": "candidate"
+    },
+    {
+      "file": "131-wildflowers-wild-white-daisy-growing-directly-in-soil.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "6c3f2cd5bee54f3e78e1957014c3feffff7f95c8635ca370097488044f74202d",
+      "status": "candidate"
+    },
+    {
+      "file": "132-wildflowers-pink-cosmos-growing-directly-in-soil.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "1135c5a67ff87f62cb19d44bc8b1c59608c31bfcbd02cc8865597de2be10aba1",
+      "status": "candidate"
+    },
+    {
+      "file": "133-wildflowers-purple-lavender-growing-directly-in-soil.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "66da14b73553accae51d2fc7d3a43ffd214d1bf477a9c3e3f624e282b968918e",
+      "status": "candidate"
+    },
+    {
+      "file": "134-wildflowers-yellow-buttercup-growing-directly-in-soil.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "7b1686619bc7c0cfa7d18b74e1291bc9e8712786947a35dbdf7ebab232f7f93f",
+      "status": "candidate"
+    },
+    {
+      "file": "135-wildflowers-blue-forget-me-not-growing-directly-in-soil.png",
+      "size": [
+        1159,
+        1358
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "318510436e8757f51a006fd9c89d2eef533b7d4a6c5e47e55406cdd254490919",
+      "status": "candidate"
+    }
+  ]
+}

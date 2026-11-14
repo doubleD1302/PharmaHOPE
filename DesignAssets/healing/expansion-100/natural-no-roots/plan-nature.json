@@ -1,0 +1,95 @@
+{
+  "prompt_template": "ONE separate isolated natural healing garden sprite: SUBJECT. Natural outdoor botanical illustration, organic shapes, soft hand-painted pastel watercolor, no pot, no vase, no planter, no container, no exposed roots, no root system, no cutaway, no soil cross section, no mound of dirt, no ground slab. Plants end neatly at the base, ready to overlap a background. No text, no halo, no cast shadow, full silhouette, transparent background. For animals retain natural anatomy and no accessories.",
+  "items": [
+    {
+      "id": "086",
+      "category": "nature",
+      "subject": "mossy river stone",
+      "file": "086-nature-mossy-river-stone.png"
+    },
+    {
+      "id": "087",
+      "category": "nature",
+      "subject": "smooth oval river pebble",
+      "file": "087-nature-smooth-oval-river-pebble.png"
+    },
+    {
+      "id": "088",
+      "category": "nature",
+      "subject": "mossy fallen log",
+      "file": "088-nature-mossy-fallen-log.png"
+    },
+    {
+      "id": "089",
+      "category": "nature",
+      "subject": "small forest stump with moss",
+      "file": "089-nature-small-forest-stump-with-moss.png"
+    },
+    {
+      "id": "090",
+      "category": "nature",
+      "subject": "cluster of wild mushrooms",
+      "file": "090-nature-cluster-of-wild-mushrooms.png"
+    },
+    {
+      "id": "091",
+      "category": "nature",
+      "subject": "single red capped mushroom",
+      "file": "091-nature-single-red-capped-mushroom.png"
+    },
+    {
+      "id": "092",
+      "category": "nature",
+      "subject": "single cream mushroom",
+      "file": "092-nature-single-cream-mushroom.png"
+    },
+    {
+      "id": "093",
+      "category": "nature",
+      "subject": "pine cone",
+      "file": "093-nature-pine-cone.png"
+    },
+    {
+      "id": "094",
+      "category": "nature",
+      "subject": "acorn with leaf",
+      "file": "094-nature-acorn-with-leaf.png"
+    },
+    {
+      "id": "095",
+      "category": "nature",
+      "subject": "small round rain puddle",
+      "file": "095-nature-small-round-rain-puddle.png"
+    },
+    {
+      "id": "096",
+      "category": "nature",
+      "subject": "water lily leaf",
+      "file": "096-nature-water-lily-leaf.png"
+    },
+    {
+      "id": "097",
+      "category": "nature",
+      "subject": "single white water lily",
+      "file": "097-nature-single-white-water-lily.png"
+    },
+    {
+      "id": "098",
+      "category": "nature",
+      "subject": "single pink lotus flower",
+      "file": "098-nature-single-pink-lotus-flower.png"
+    },
+    {
+      "id": "099",
+      "category": "nature",
+      "subject": "driftwood branch",
+      "file": "099-nature-driftwood-branch.png"
+    },
+    {
+      "id": "100",
+      "category": "nature",
+      "subject": "natural bird nest with eggs",
+      "file": "100-nature-natural-bird-nest-with-eggs.png"
+    }
+  ]
+}

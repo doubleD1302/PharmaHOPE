@@ -1,0 +1,92 @@
+{
+  "status": "candidate",
+  "count": 6,
+  "unique_sha256": 6,
+  "note": "Generated candidates. Alpha edge quality, consistency, animation and iOS behavior are not yet approved.",
+  "assets": [
+    {
+      "file": "001-flowers-white-wild-daisy.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "42381b673a591934b5ed10b1b95627da668b34ae57ab1a5d8bcd2c179dd46d0c",
+      "status": "candidate"
+    },
+    {
+      "file": "002-flowers-pink-cosmos.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "4b0fa73a5fd77fdc772a7282d920857bf463167add7437cab9837545f32f6e1d",
+      "status": "candidate"
+    },
+    {
+      "file": "004-flowers-yellow-buttercup.png",
+      "size": [
+        1214,
+        1295
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "ab399af84c2b7d55167b77455f709e0ed4875e8b002d31cf27bf7fd27fb9f119",
+      "status": "candidate"
+    },
+    {
+      "file": "024-flowers-pink-hollyhock.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "d50a17b29562f4d75507c48331686a378da843a5403f96d5938f30f44b920a89",
+      "status": "candidate"
+    },
+    {
+      "file": "037-trees-young-golden-ginkgo-tree.png",
+      "size": [
+        1172,
+        1342
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "53f8c1e7e5b23c94bac795574cb914d3454d455521d43b69cd48d38c8ae35394",
+      "status": "candidate"
+    },
+    {
+      "file": "038-trees-young-willow-tree.png",
+      "size": [
+        1187,
+        1326
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "d5f5da963b6b67d58476a049dc01a13fd0caabaec03f65b6e3c0896ffc9b7db3",
+      "status": "candidate"
+    }
+  ]
+}

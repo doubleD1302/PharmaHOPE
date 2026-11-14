@@ -1,0 +1,11 @@
+# Xcode / XcodeGen
+Hope.xcodeproj/
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.ipa
+*.xcarchive
+.DS_Store
+Thumbs.db
+__pycache__/

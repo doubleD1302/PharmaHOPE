@@ -1,0 +1,125 @@
+{
+  "prompt_template": "Create ONE individual isolated natural healing garden game asset: SUBJECT. Hand-painted soft pastel watercolor, organic natural appearance. For a plant or tree, show a small natural footing: a modest patch of grass, moss and earth surface around the base, with the plant visually emerging from it; roots stay hidden underground. The footing should be shallow and organic so it can blend into a vertically scrolling garden. For an animal or object, a small natural contact patch only when helpful. No pots, vases, containers, exposed roots, cutaway soil, artificial pedestal, text or unrelated objects. Entire asset including its small footing visible with margin; transparent outside the asset, clean silhouette, no halo.",
+  "items": [
+    {
+      "id": "066",
+      "category": "vegetation",
+      "subject": "wild strawberry plant with fruit",
+      "file": "066-vegetation-wild-strawberry-plant-with-fruit.png"
+    },
+    {
+      "id": "067",
+      "category": "vegetation",
+      "subject": "small blueberry bush",
+      "file": "067-vegetation-small-blueberry-bush.png"
+    },
+    {
+      "id": "068",
+      "category": "vegetation",
+      "subject": "blackberry bramble",
+      "file": "068-vegetation-blackberry-bramble.png"
+    },
+    {
+      "id": "069",
+      "category": "vegetation",
+      "subject": "rosemary bush",
+      "file": "069-vegetation-rosemary-bush.png"
+    },
+    {
+      "id": "070",
+      "category": "vegetation",
+      "subject": "wild mint",
+      "file": "070-vegetation-wild-mint.png"
+    },
+    {
+      "id": "071",
+      "category": "vegetation",
+      "subject": "curled fern fiddlehead",
+      "file": "071-vegetation-curled-fern-fiddlehead.png"
+    },
+    {
+      "id": "072",
+      "category": "vegetation",
+      "subject": "cluster of green ferns",
+      "file": "072-vegetation-cluster-of-green-ferns.png"
+    },
+    {
+      "id": "073",
+      "category": "vegetation",
+      "subject": "ivy vine",
+      "file": "073-vegetation-ivy-vine.png"
+    },
+    {
+      "id": "074",
+      "category": "vegetation",
+      "subject": "oak fallen leaves",
+      "file": "074-vegetation-oak-fallen-leaves.png"
+    },
+    {
+      "id": "075",
+      "category": "vegetation",
+      "subject": "soft meadow grass",
+      "file": "075-vegetation-soft-meadow-grass.png"
+    },
+    {
+      "id": "076",
+      "category": "vegetation",
+      "subject": "clover leaves",
+      "file": "076-vegetation-clover-leaves.png"
+    },
+    {
+      "id": "077",
+      "category": "vegetation",
+      "subject": "dandelion seed head",
+      "file": "077-vegetation-dandelion-seed-head.png"
+    },
+    {
+      "id": "078",
+      "category": "vegetation",
+      "subject": "moss patch",
+      "file": "078-vegetation-moss-patch.png"
+    },
+    {
+      "id": "079",
+      "category": "vegetation",
+      "subject": "wild sage bush",
+      "file": "079-vegetation-wild-sage-bush.png"
+    },
+    {
+      "id": "080",
+      "category": "vegetation",
+      "subject": "wild thyme",
+      "file": "080-vegetation-wild-thyme.png"
+    },
+    {
+      "id": "081",
+      "category": "vegetation",
+      "subject": "juniper shrub",
+      "file": "081-vegetation-juniper-shrub.png"
+    },
+    {
+      "id": "082",
+      "category": "vegetation",
+      "subject": "raspberry bush",
+      "file": "082-vegetation-raspberry-bush.png"
+    },
+    {
+      "id": "083",
+      "category": "vegetation",
+      "subject": "wood sorrel",
+      "file": "083-vegetation-wood-sorrel.png"
+    },
+    {
+      "id": "084",
+      "category": "vegetation",
+      "subject": "tiny wheat grass shoots",
+      "file": "084-vegetation-tiny-wheat-grass-shoots.png"
+    },
+    {
+      "id": "085",
+      "category": "vegetation",
+      "subject": "cattail reeds",
+      "file": "085-vegetation-cattail-reeds.png"
+    }
+  ]
+}

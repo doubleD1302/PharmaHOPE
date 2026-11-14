@@ -1,0 +1,820 @@
+{
+  "status": "candidate",
+  "note": "Original generated files. Visual/alpha QA, animation, upgrade consistency and background joins remain unverified. Composite scene-reference excluded from count.",
+  "count_excluding_reference": 54,
+  "assets": [
+    {
+      "file": "bench.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "65c8ccfdd0bf38d3baca9d10ef588826d0d62899316ce041a152ee37f7df8d58",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "bg-bottom.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "704c503245bb7c05e9151153dab4256c0564009fbbc25e2b53176d717a6c6ad0",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "bg-middle.png",
+      "size": [
+        941,
+        1672
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "f715bb79063fd57d1c8e4f1abe666fd79296b9d24ed42d09e3ebd8df7d232854",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "bg-top.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "00eb98ae88e14fd62ea81b29f8ca07555d69fb3d29f41c83c946bd258b77174f",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "birdhouse.png",
+      "size": [
+        1217,
+        1292
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "91f0ca0f0044827e09d811a2788e23ef419dedaff80795caea48a244d43a9f3f",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "flower-pot.png",
+      "size": [
+        1122,
+        1402
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "b4caca226f0bddd05a8f1b7769e1b4b24c0fde7a23234510d747b50786a05688",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "garden-background.png",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "alpha": null,
+      "sha256": "8c62fafad5a9af5ea910c11fb3893dae73180ca5502fbd26ba3a6ee307ec42a3",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "hope-mascot.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "6c30e1723c13866d9f8d5bf13b941f4ad7d40c2444e988b200c4fb7a51d50e14",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "journal.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "3345deb4329fe3276ecec82fb908498505107bc4e4c5b848768239e4f222b65f",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "lantern.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "35bd8e539fefae5e231557380499a8efd33915dfd1cc1599c69c5c8b9c475a0f",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "mascot-eyes-open.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "dadc8c6ea95fe90b7d716b8a699dffee0c38400c5044d61b582bb200392f5388",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "mascot-wave.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "2edae603cbb53d2147b809f1e0eb9c7b88ba749396fc5ea43f7dc138bcb48814",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-05457b1e-3266-4aba-97bb-0f797a244fb2.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "9aa9fcb2d8c5f44023af10efa116715267b567d4ab4f854aa48ccc35ce4c3842",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-05a95deb-fe51-4e53-9bad-a8daa37764ff.png",
+      "size": [
+        1230,
+        1278
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "229d30d3a66e7a6ec9b0d0c646098829561db56dd8af1c91cf9f1675ef429fda",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-08115b96-16f6-4104-b1a3-13774e66dec5.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "ec44020daa2b88aa58e3a0417fcc43d7bad4f54de90e0064011614c6580b2214",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-12182169-0014-4288-9414-8dc29023c3fd.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "9b96d92976446df31f1236993e62e14d81c93b41cd793f0aeb163c30ff2a6925",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-18340f77-5dc2-48f5-aeeb-882e4480eb44.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "7622bbfa61391f460ff70fa3b58137859db191c3943f0d054659ffcea133aaa1",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-1a2c939f-5e35-4cdc-bcac-494d3369cf5c.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "427a0f60af6c344f032e6411c66e2b2c32adaec7667bef2c3d6aad0fd52d6833",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-1dc4ead9-81d3-40e9-89a0-9a681abb7f9d.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "0a17ba7597b13b5bdd2a131d8a449012a1104a515506829ec65f4409b1fe6375",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-1dea6e90-fa36-45d0-90d3-151a839c84e4.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "38179c524985baca6c65a0c1eca740c93e1f602010f0085b451912b518a28795",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-26af1c60-ff2e-40cb-bf60-e592a1e2016f.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "fe15b511fece935eeb7274aab37a93d00bc5581bf7c14bf43839802425c810fc",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-371c7b55-8971-4ee5-b265-9533f9df7954.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "c3a359a1f9a81a4dca313086296ae9d066e733498a4714df9ca8e759c1302039",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-468c81ea-785a-44fd-b63a-0256c8a9f478.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "d87ba4999fb62acc138fe4ef64ce3fdffcb50a2cdcc19078b0e14ab8c990b61e",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-4897342a-f996-476a-8cec-24f6d8623f15.png",
+      "size": [
+        1218,
+        1292
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "1624c1b63f41d06afa46932f9109480dfacf9e43865c67a0fac6532ff92108c8",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-4b9ef77e-4c7e-42bf-8045-c43f0466cd0e.png",
+      "size": [
+        1174,
+        1339
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "f2b354f65788de3a1871ba164b017233c912a04d21cedd8678f62c8f04226914",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-501e01c2-1637-42fe-acae-aa330651f0ab.png",
+      "size": [
+        1214,
+        1295
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "ddaa1e3c11bfc0bbd6b9ecde32f385ae8801f23bb2d8b352a3e00c6634642998",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-50f30c05-abc2-480b-800d-7347eeeed698.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "991233ece8a7932d334da19dd585d22138fd6484d3f9a9e274c8f23cb82e00ae",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-5c3ff20f-d342-4e6d-8f33-2385ae2ab8dd.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "ba387f871012d37ea6febfa9a330348d5a8a56a3c71d98d90946466d339e9dd8",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-5f2a418e-aaab-4dc4-b00c-eef0b8d39220.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "6d1a4cadb847bb9d63e56fa4fdc163dff178b4fac87945a8bb1e14633e7a4695",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-6c0f2437-b432-4092-a83b-8bc5f7995a43.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "219730ce24ea3996b09cf64fa055470c6607e9de190f6080e910b81a1a1b7360",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-7fef8849-c57d-42a8-b5a9-ff36cdfd12b8.png",
+      "size": [
+        1230,
+        1278
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "40b391e5a079ff9c107d4d6e01a079e8fdc2457e9f0b6e456839eeccf3d7926a",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-91173024-4a92-4dab-adff-313de1b1c449.png",
+      "size": [
+        1236,
+        1273
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "fafc54d596ee7d25234b89cfe20b5d1371eed52fc3a6921addcac8c2b784e809",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-91cc5cd2-4a50-4fc9-a0e9-218af1db592f.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "c1efdfb4325b5f8ee66a63d03760dd8f71751f35c99d8be8d0a5086744755458",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-92b87c3d-3820-4186-ba85-833d5fb7324e.png",
+      "size": [
+        1230,
+        1278
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "348722cc3b0cce12641dc11496d88dd620931df24b5c0f8868de638837bef7f4",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-99480865-538e-47cb-915e-a659277bcacd.png",
+      "size": [
+        1219,
+        1290
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "9a22cb5ce54b29fc705c595d038a9f4262309ced5b9277652f1ec1722b651837",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-adb5f31e-c2d2-4319-bb2f-0de4615d0b55.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "82dd85ce25b2239500afe836dc32fe69612e8a1da9d32541bdb93c3434b1ac16",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-bc6d7e27-954f-4abd-a472-5bf473d44dff.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "c1df1dcea2daf1c4649a37b1dd5ca6447eb65f3f3f77aa6e45b7ec674fb15574",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-c2a6e9d4-89ce-4d7d-bba9-c27615e9d53c.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "626da6c89b4d99cb13a9c0efff2ac7708df9d26f848d7047cf2e5fb184c89329",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-c7bd38c2-5204-4f49-bcd0-e11bbdd9a6bb.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "b86dce257c0172b0f0f0dfb9a07d18ba67bf704ba8633c21aef12ff139519449",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-d6a7cad1-eee9-433d-9004-8e3233d346b5.png",
+      "size": [
+        1228,
+        1281
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "cb5e0e32bdc4d05408e96aeef9e85a00d4b3bb6689326e5a33882f0ce0730bf0",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-dda7977e-a97c-4487-bc7e-d15826ad00d9.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "29aa9f0e3b6848fbb132b9a5c52fe219e10020c898491319602b2f7f25fa3c30",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-e0eb8e90-19f8-45f1-8651-dc1d7a5dccc5.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "977d29032d4647bc3360e11cc5d600f335c8af47f83bede526d5fd8d6565208b",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-e88f7e9c-aaf3-41a4-bb23-6453b5a9a0f3.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "77941a1535509f6b62cce102cec447e6339ad125f36d1ef9c4ca3e24504fef52",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-f3b5c406-0787-4939-bde7-989e54517b85.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "69fd540ce41d709f29f890c68b914b79ae476ac84a9a9a92ccdfc1583788bb6f",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-f3fd1469-f622-40c6-9baa-affca774df98.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "070a0f4a8d62d2db5783fce168c7c47841e02751beefab42e8481953e2db1447",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-f592a183-d122-4b0e-9a24-fa58b0649709.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "5a1b7cde97b2667af8faefaad23433a6094aaca09467e3da14f74703481367e4",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-f6370325-b518-46cf-a880-d361df9525d2.png",
+      "size": [
+        1312,
+        1199
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "be8e74b5966f0e2728c2dc8cecfeda73d0602d66434a5fbb9dfdc02d468c382d",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "new-candidates/candidate-f99cd2e2-4f8f-4357-9d12-627c37570299.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "5a4c26442004dee67557f4047e5d43187535ba5f17b92aa425ddf1553b393e35",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "plant-level-2.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "7f1ebde66093b88c4644ba346a2247097a57806da350e6f62ac94b74a1dc91c6",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "plant-level-3.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "ff7ae9917738899a57b79f213ce72fa7ccb69d0307a9557ffcc3f07216296bb8",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "potted-sprout.png",
+      "size": [
+        1199,
+        1312
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "d0436732966caeba5bff15e9de603ca51ecfecb3c09592b4b886c2f778f134fb",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "scene-reference.png",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        212,
+        249
+      ],
+      "sha256": "2d21bd52441479aaaf469b0c65497c6edd8f0cecb7d8b98bbf93a78f2f013161",
+      "status": "candidate",
+      "reference_only": true
+    },
+    {
+      "file": "tea-cup.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "ea857b6c22a74c0063b05207287a75e72cc090b1350264cc9a2c3cbcf4ad70cb",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "watering-bucket.png",
+      "size": [
+        1213,
+        1296
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        255
+      ],
+      "sha256": "b3d4852c9b4e82e6e3db4f28446852cb0c92f242d9cd873f2efa8e138d907deb",
+      "status": "candidate",
+      "reference_only": false
+    },
+    {
+      "file": "watering-can.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "mode": "RGBA",
+      "alpha": [
+        0,
+        254
+      ],
+      "sha256": "8d811abeb14d81d9d462d2c32bc57b388ad98334682577b1fb8539af988b2bfd",
+      "status": "candidate",
+      "reference_only": false
+    }
+  ]
+}

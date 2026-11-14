@@ -1,0 +1,185 @@
+{
+  "prompt_template": "Create ONE individual isolated natural healing garden game asset: SUBJECT. Hand-painted soft pastel watercolor, organic natural appearance. For a plant or tree, show a small natural footing: a modest patch of grass, moss and earth surface around the base, with the plant visually emerging from it; roots stay hidden underground. The footing should be shallow and organic so it can blend into a vertically scrolling garden. For an animal or object, a small natural contact patch only when helpful. No pots, vases, containers, exposed roots, cutaway soil, artificial pedestal, text or unrelated objects. Entire asset including its small footing visible with margin; transparent outside the asset, clean silhouette, no halo.",
+  "items": [
+    {
+      "id": "001",
+      "category": "flowers",
+      "subject": "white wild daisy",
+      "file": "001-flowers-white-wild-daisy.png"
+    },
+    {
+      "id": "002",
+      "category": "flowers",
+      "subject": "pink cosmos",
+      "file": "002-flowers-pink-cosmos.png"
+    },
+    {
+      "id": "003",
+      "category": "flowers",
+      "subject": "purple lavender",
+      "file": "003-flowers-purple-lavender.png"
+    },
+    {
+      "id": "004",
+      "category": "flowers",
+      "subject": "yellow buttercup",
+      "file": "004-flowers-yellow-buttercup.png"
+    },
+    {
+      "id": "005",
+      "category": "flowers",
+      "subject": "blue forget-me-not",
+      "file": "005-flowers-blue-forget-me-not.png"
+    },
+    {
+      "id": "006",
+      "category": "flowers",
+      "subject": "white clover flower",
+      "file": "006-flowers-white-clover-flower.png"
+    },
+    {
+      "id": "007",
+      "category": "flowers",
+      "subject": "pink wild rose bush",
+      "file": "007-flowers-pink-wild-rose-bush.png"
+    },
+    {
+      "id": "008",
+      "category": "flowers",
+      "subject": "yellow primrose",
+      "file": "008-flowers-yellow-primrose.png"
+    },
+    {
+      "id": "009",
+      "category": "flowers",
+      "subject": "purple violet",
+      "file": "009-flowers-purple-violet.png"
+    },
+    {
+      "id": "010",
+      "category": "flowers",
+      "subject": "red poppy",
+      "file": "010-flowers-red-poppy.png"
+    },
+    {
+      "id": "011",
+      "category": "flowers",
+      "subject": "pink peony",
+      "file": "011-flowers-pink-peony.png"
+    },
+    {
+      "id": "012",
+      "category": "flowers",
+      "subject": "blue iris",
+      "file": "012-flowers-blue-iris.png"
+    },
+    {
+      "id": "013",
+      "category": "flowers",
+      "subject": "white wild lily",
+      "file": "013-flowers-white-wild-lily.png"
+    },
+    {
+      "id": "014",
+      "category": "flowers",
+      "subject": "yellow dandelion",
+      "file": "014-flowers-yellow-dandelion.png"
+    },
+    {
+      "id": "015",
+      "category": "flowers",
+      "subject": "pink clover flower",
+      "file": "015-flowers-pink-clover-flower.png"
+    },
+    {
+      "id": "016",
+      "category": "flowers",
+      "subject": "white chamomile",
+      "file": "016-flowers-white-chamomile.png"
+    },
+    {
+      "id": "017",
+      "category": "flowers",
+      "subject": "purple bellflower",
+      "file": "017-flowers-purple-bellflower.png"
+    },
+    {
+      "id": "018",
+      "category": "flowers",
+      "subject": "blue cornflower",
+      "file": "018-flowers-blue-cornflower.png"
+    },
+    {
+      "id": "019",
+      "category": "flowers",
+      "subject": "white anemone",
+      "file": "019-flowers-white-anemone.png"
+    },
+    {
+      "id": "020",
+      "category": "flowers",
+      "subject": "pink azalea",
+      "file": "020-flowers-pink-azalea.png"
+    },
+    {
+      "id": "021",
+      "category": "flowers",
+      "subject": "purple heather",
+      "file": "021-flowers-purple-heather.png"
+    },
+    {
+      "id": "022",
+      "category": "flowers",
+      "subject": "white jasmine shrub",
+      "file": "022-flowers-white-jasmine-shrub.png"
+    },
+    {
+      "id": "023",
+      "category": "flowers",
+      "subject": "orange calendula",
+      "file": "023-flowers-orange-calendula.png"
+    },
+    {
+      "id": "024",
+      "category": "flowers",
+      "subject": "pink hollyhock",
+      "file": "024-flowers-pink-hollyhock.png"
+    },
+    {
+      "id": "025",
+      "category": "flowers",
+      "subject": "purple lupine",
+      "file": "025-flowers-purple-lupine.png"
+    },
+    {
+      "id": "026",
+      "category": "flowers",
+      "subject": "white snowdrop",
+      "file": "026-flowers-white-snowdrop.png"
+    },
+    {
+      "id": "027",
+      "category": "flowers",
+      "subject": "purple crocus",
+      "file": "027-flowers-purple-crocus.png"
+    },
+    {
+      "id": "028",
+      "category": "flowers",
+      "subject": "pink wild orchid",
+      "file": "028-flowers-pink-wild-orchid.png"
+    },
+    {
+      "id": "029",
+      "category": "flowers",
+      "subject": "yellow evening primrose",
+      "file": "029-flowers-yellow-evening-primrose.png"
+    },
+    {
+      "id": "030",
+      "category": "flowers",
+      "subject": "wild sunflower",
+      "file": "030-flowers-wild-sunflower.png"
+    }
+  ]
+}
