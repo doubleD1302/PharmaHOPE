@@ -40,12 +40,13 @@ public enum GeminiModelPicker {
     }
 
     /// Thứ tự thử: hai Flash-Lite mới nhất, hai Flash mới nhất, bí danh, bản cố định.
-    public static func chain(from discovered: [String], preferred: String? = nil) -> [String] {
+    /// `preferFull`: dùng cho trò chuyện cần hiểu sâu, thử Flash đầy đủ trước rồi mới tới Flash-Lite.
+    public static func chain(from discovered: [String], preferred: String? = nil, preferFull: Bool = false) -> [String] {
         let parsed = discovered.compactMap(parse)
         let lite: [String] = rankedByVersion(parsed.filter { $0.isLite }).prefix(2).map { $0.id }
         let full: [String] = rankedByVersion(parsed.filter { !$0.isLite }).prefix(2).map { $0.id }
-        var ordered: [String] = lite + full
-        ordered += aliasModels
+        var ordered: [String] = preferFull ? full + lite : lite + full
+        ordered += preferFull ? Array(aliasModels.reversed()) : aliasModels
         ordered += seedModels
         if let preferred, !preferred.isEmpty { ordered.insert(preferred, at: 0) }
         var seen = Set<String>()
@@ -119,19 +120,23 @@ public actor GeminiClient {
 
     // MARK: - Gọi model
 
-    public func generate(system: String, user: String, maxOutputTokens: Int = 1024) async -> GeminiResult? {
+    /// `budget`: tổng thời gian chờ, `attemptTimeout`: chờ tối đa cho mỗi model. Mặc định 15 và 12 giây; trò chuyện cho phép chờ lâu hơn.
+    public func generate(system: String, user: String, maxOutputTokens: Int = 1024,
+                         budget: TimeInterval = GeminiClient.totalBudget, attemptTimeout: TimeInterval = 12,
+                         preferQuality: Bool = false) async -> GeminiResult? {
         guard let key = GeminiKeyStore.load() else { return nil }
-        let deadline = Date().addingTimeInterval(Self.totalBudget)
+        let deadline = Date().addingTimeInterval(budget)
         let discovered = await discoverModels(key: key, deadline: deadline)
-        let chain = GeminiModelPicker.chain(from: discovered, preferred: defaults.string(forKey: lastGoodKey))
+        // Trả lời sâu thì ưu tiên model mạnh và không bám theo model nhẹ từng chạy được.
+        let chain = GeminiModelPicker.chain(from: discovered, preferred: preferQuality ? nil : defaults.string(forKey: lastGoodKey), preferFull: preferQuality)
         var networkFailures = 0
         for model in chain.prefix(maximumAttempts) {
             if Task.isCancelled { return nil }
-            let timeout = Self.timeout(upTo: 12, until: deadline)
+            let timeout = Self.timeout(upTo: attemptTimeout, until: deadline)
             if timeout < Self.minimumAttemptTime { return nil }   // hết ngân sách thời gian
             switch await attempt(model: model, key: key, system: system, user: user, maxOutputTokens: maxOutputTokens, timeout: timeout) {
             case .success(let text):
-                defaults.set(model, forKey: lastGoodKey)
+                if !preferQuality { defaults.set(model, forKey: lastGoodKey) }
                 return GeminiResult(text: text, model: model)
             case .badKey:
                 return nil

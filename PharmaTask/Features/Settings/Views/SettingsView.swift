@@ -5,7 +5,7 @@ import UserNotifications
 public struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
-    @State private var hasKey = GeminiKeyStore.hasKey
+    @State private var hasKey = GeminiKeyStore.hasUserKey
     @State private var draftKey = ""
     @State private var keySaveFailed = false
     @State private var notificationsAllowed = false
@@ -26,9 +26,9 @@ public struct SettingsView: View {
                 }.listRowBackground(HopeTheme.surface)
 
                 Section {
-                    Label(hasKey ? "Đã thêm khóa Gemini" : "Chưa kết nối Gemini", systemImage: "sparkles")
+                    Label(hasKey ? "Đã thêm khóa Gemini của bạn" : (GeminiKeyStore.usesBundledKey ? "Hope đã kết nối Gemini sẵn, bạn không cần cài đặt" : "Chưa kết nối Gemini"), systemImage: "sparkles")
                         .foregroundStyle(HopeTheme.accent)
-                    SecureField(hasKey ? "Nhập khóa mới để thay thế" : "Gemini API Key", text: $draftKey)
+                    SecureField(hasKey ? "Nhập khóa mới để thay thế" : (GeminiKeyStore.usesBundledKey ? "Khóa riêng (không bắt buộc)" : "Gemini API Key"), text: $draftKey)
                         .font(.body).textInputAutocapitalization(.never).autocorrectionDisabled()
                         .accessibilityLabel("Khóa API Gemini cá nhân")
                     if hasKey {
@@ -37,7 +37,7 @@ public struct SettingsView: View {
                         }
                     }
                 } header: { Text("Lời nhắn cho khu vườn") } footer: {
-                    Text("Khóa được lưu trong Keychain của iPhone. Hope dùng Gemini cho lời nhắn, lời nhắc nghỉ, câu mở đầu nhật ký, thư tuần và lời của Hope. Mặc định chỉ cảm xúc bạn chọn, buổi trong ngày hoặc số lượng việc được gửi đi, không gửi tên việc. Bài nhật ký chỉ được gửi khi bạn tự bấm nghe lời đáp và đồng ý. Không có khóa hoặc không có mạng, Hope dùng nội dung viết sẵn.")
+                    Text("Khóa riêng (nếu bạn nhập) được lưu trong Keychain của iPhone và được dùng thay cho khóa dựng sẵn. Hope dùng Gemini cho lời nhắn, câu trích của vườn, lời nhắc nghỉ, câu mở đầu nhật ký, thư tuần và trò chuyện với các nhân vật. Mặc định chỉ cảm xúc bạn chọn, buổi trong ngày hoặc số lượng việc được gửi đi, không gửi tên việc. Bài nhật ký chỉ được gửi khi bạn tự bấm nghe lời đáp và đồng ý. Tin nhắn bạn gõ khi trò chuyện với nhân vật được gửi đi sau khi bạn đồng ý một lần. Không có khóa hoặc không có mạng, Hope dùng nội dung viết sẵn.")
                 }
                 .listRowBackground(HopeTheme.surface)
 

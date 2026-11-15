@@ -90,6 +90,14 @@ final class HealingTests: XCTestCase {
         XCTAssertFalse(chain.contains("gemini-3.8-flash-image"))
     }
 
+    func testChatChainTriesFullFlashBeforeLite() {
+        let discovered = ["models/gemini-3.5-flash-lite", "models/gemini-3.8-flash", "models/gemini-3.6-flash"]
+        let chain = GeminiModelPicker.chain(from: discovered, preferFull: true)
+        XCTAssertEqual(Array(chain.prefix(3)), ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-lite"])
+        XCTAssertEqual(chain.count, Set(chain).count)
+        XCTAssertLessThan(try XCTUnwrap(chain.firstIndex(of: "gemini-flash-latest")), try XCTUnwrap(chain.firstIndex(of: "gemini-flash-lite-latest")))
+    }
+
     func testModelChainStillWorksWhenDiscoveryFailsAndRespectsPreferred() {
         let fallback = GeminiModelPicker.chain(from: [])
         XCTAssertEqual(fallback.first, "gemini-flash-lite-latest")

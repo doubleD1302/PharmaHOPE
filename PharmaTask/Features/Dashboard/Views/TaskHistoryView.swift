@@ -11,6 +11,8 @@ struct TaskHistoryView: View {
     @State private var allDates = false
     @State private var from = Calendar.current.date(byAdding: .day, value: -30, to: .now) ?? .now
     @State private var to = Date()
+    @State private var month = HopeCalendarMath.startOfMonth(.now)
+    @State private var picking = false
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -33,8 +35,19 @@ struct TaskHistoryView: View {
                         }
                         Toggle("Mọi ngày tạo việc", isOn: $allDates)
                         if !allDates {
-                            DatePicker("Từ ngày tạo", selection: $from, displayedComponents: .date)
-                            DatePicker("Đến ngày tạo", selection: $to, in: from..., displayedComponents: .date)
+                            Text("Chạm một ngày để chọn ngày bắt đầu, chạm ngày thứ hai để chọn ngày kết thúc. Chấm dưới ngày là có việc tạo hôm đó.")
+                                .font(.footnote).foregroundStyle(HopeTheme.secondary).frame(maxWidth: .infinity, alignment: .leading)
+                            HistoryCalendar(month: $month, from: $from, to: $to, picking: $picking).id(month)
+                            HStack {
+                                Text("\(from.formatted(date: .abbreviated, time: .omitted)) – \(to.formatted(date: .abbreviated, time: .omitted))")
+                                    .font(.footnote.weight(.medium)).foregroundStyle(HopeTheme.ink)
+                                Spacer()
+                            }
+                            HStack(spacing: 8) {
+                                quickRange("Hôm nay", days: 0)
+                                quickRange("7 ngày qua", days: 6)
+                                quickRange("30 ngày qua", days: 29)
+                            }
                         }
                     }.padding(.top, 12).font(.subheadline)
                 }.padding(20).background(HopeTheme.surface)
@@ -47,6 +60,17 @@ struct TaskHistoryView: View {
             .background(HopeTheme.background).tint(HopeTheme.accent)
             .onChange(of: from) { _, date in if to < date { to = date } }
         }
+    }
+    private func quickRange(_ title: String, days: Int) -> some View {
+        Button(title) {
+            let cal = Calendar.current
+            to = cal.startOfDay(for: .now)
+            from = cal.date(byAdding: .day, value: -days, to: to) ?? to
+            month = HopeCalendarMath.startOfMonth(to)
+            picking = false
+        }
+        .font(.footnote.weight(.medium)).padding(.horizontal, 12).frame(minHeight: 36)
+        .background(HopeTheme.surfaceMuted, in: Capsule()).foregroundStyle(HopeTheme.ink)
     }
     private func results(now: Date) -> some View {
         HistoryResults(search: TaskText.normalized(search), state: state, priority: priority, shiftID: shiftID,
@@ -134,5 +158,40 @@ private struct HistoryResults: View {
     private func remove(_ task: TaskItem) {
         do { try TaskCommands.delete(task, context: context); lastDeleted = task; viewModel.refresh(context: context) }
         catch { context.rollback(); viewModel.report(error) }
+    }
+}
+
+
+/// Lịch chọn khoảng ngày tạo việc, có chấm ở những ngày có việc.
+@MainActor
+private struct HistoryCalendar: View {
+    @Binding var month: Date
+    @Binding var from: Date
+    @Binding var to: Date
+    @Binding var picking: Bool
+    @Query private var tasks: [TaskItem]
+
+    init(month: Binding<Date>, from: Binding<Date>, to: Binding<Date>, picking: Binding<Bool>) {
+        _month = month; _from = from; _to = to; _picking = picking
+        let range = HopeCalendarMath.visibleRange(for: month.wrappedValue)
+        let start = range.start
+        let end = range.end
+        _tasks = Query(filter: #Predicate<TaskItem> { $0.createdAt >= start && $0.createdAt < end && $0.deletedAt == nil })
+    }
+
+    private var marks: [Date: [Color]] {
+        let calendar = Calendar.current
+        return Dictionary(grouping: tasks, by: { calendar.startOfDay(for: $0.createdAt) })
+            .mapValues { items in [items.allSatisfy(\.isCompleted) ? HopeTheme.accent : HopeTheme.amber] }
+    }
+
+    var body: some View {
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: from)
+        let end = calendar.startOfDay(for: max(from, to))
+        HopeMonthCalendar(month: $month, selected: [start, end], range: start...end, marks: marks) { day in
+            if !picking || day < start { from = day; to = day; picking = true }
+            else { to = day; picking = false }
+        }
     }
 }

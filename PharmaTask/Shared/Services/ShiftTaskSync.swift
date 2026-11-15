@@ -47,5 +47,9 @@ public enum ShiftTaskSync {
         }
         let inbox = shift == nil ? [] : try tasks(in: context, shiftID: nil)
         try await NotificationScheduler.shared.rebuild(tasks: currentTasks + inbox, shiftEnd: shift?.endTime)
+        let now = Date()
+        let upcoming = try context.fetch(FetchDescriptor<ShiftConfig>(
+            predicate: #Predicate { $0.startTime > now && !$0.isActive }, sortBy: [SortDescriptor(\ShiftConfig.startTime)]))
+        try await NotificationScheduler.shared.rebuildShiftStarts(upcoming)
     }
 }

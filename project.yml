@@ -25,8 +25,21 @@ targets:
           - "GardenCreatures/**"
     info:
       path: PharmaTask/Info.plist
+      properties:
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        LSRequiresIPhoneOS: true
+        NSSupportsLiveActivities: true
+        NSSupportsLiveActivitiesFrequentUpdates: true
+        UIBackgroundModes: [audio, fetch, remote-notification]
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        HopeGeminiKey: "$(GEMINI_API_KEY)"
     entitlements:
       path: PharmaTask/PharmaTask.entitlements
+    configFiles:
+      Debug: Config/Hope.xcconfig
+      Release: Config/Hope.xcconfig
     dependencies:
       - target: HopeWidgets
     settings:

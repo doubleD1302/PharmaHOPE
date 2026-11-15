@@ -30,6 +30,7 @@ jobs:
             -configuration Release \
             -archivePath build/Hope.xcarchive \
             -destination "generic/platform=iOS" \
+            GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""

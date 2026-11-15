@@ -8,6 +8,25 @@ public struct PlannedTaskNotification: Equatable {
     public let date: Date
 }
 
+/// Thông báo trước khi ca trực bắt đầu: 30 phút trước và đúng giờ bắt đầu, cho các ca chưa bắt đầu trong 7 ngày tới.
+public enum ShiftNotificationPlan {
+    public static func make(shifts: [ShiftConfig], now: Date = .now) -> [PlannedTaskNotification] {
+        var plan: [PlannedTaskNotification] = []
+        let horizon = now.addingTimeInterval(7 * 24 * 3600)
+        for shift in shifts where !shift.isActive && !shift.name.lowercased().contains("nghỉ") && shift.startTime > now && shift.startTime < horizon {
+            let clock = TaskText.clock(shift.startTime)
+            let early = shift.startTime.addingTimeInterval(-30 * 60)
+            if early > now {
+                plan.append(.init(id: "hope.shiftstart.\(shift.id).30", taskID: nil, title: "Sắp đến \(shift.name)",
+                                  body: "Còn 30 phút nữa là \(clock). Mở Hope để bắt đầu ca.", date: early))
+            }
+            plan.append(.init(id: "hope.shiftstart.\(shift.id).0", taskID: nil, title: "Đến giờ \(shift.name)",
+                              body: "Bạn chưa bắt đầu ca. Mở Hope để bắt đầu.", date: shift.startTime))
+        }
+        return Array(plan.sorted { $0.date == $1.date ? $0.id < $1.id : $0.date < $1.date }.prefix(20))
+    }
+}
+
 public enum TaskNotificationPlan {
     public static func make(tasks: [TaskItem], shiftEnd: Date?, now: Date = .now) -> [PlannedTaskNotification] {
         var plan: [PlannedTaskNotification] = []

@@ -19,7 +19,7 @@ public struct ContentView: View {
                 .tabItem { Label("Lịch ca", systemImage: "calendar") }.tag(1)
             TaskHistoryView()
                 .tabItem { Label("Tra cứu", systemImage: "magnifyingglass") }.tag(2)
-            HealingGardenView(isActive: selectedTab == 3)
+            HopePagerView(isActive: selectedTab == 3)
                 .tabItem { Label("Hope", systemImage: "leaf") }.tag(3)
         }
         .tint(HopeTheme.accent)
@@ -116,7 +116,8 @@ private struct HopeDashboardView: View {
                     Text("Hope").font(.headline).foregroundStyle(HopeTheme.ink)
                 }.accessibilityElement(children: .combine)
             }
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                HopeBellButton()
                 Button { showingSettings = true } label: {
                     Image(systemName: "slider.horizontal.3").font(.body.weight(.medium))
                         .frame(width: 44, height: 44).foregroundStyle(HopeTheme.ink)

@@ -1,27 +1,49 @@
 import SwiftUI
 import SwiftData
 
+/// Phép tính khi lặp một ca sang ngày khác, tách riêng để kiểm thử.
+enum ShiftRepeat {
+    /// Giữ nguyên giờ và phút của ca, chuyển sang ngày mới. Ca qua đêm (kết thúc sớm hơn bắt đầu) kết thúc vào hôm sau.
+    static func rebased(start: Date, end: Date, to day: Date, calendar: Calendar = .current) -> (start: Date, end: Date)? {
+        let s = calendar.dateComponents([.hour, .minute], from: start)
+        let e = calendar.dateComponents([.hour, .minute], from: end)
+        guard let newStart = calendar.date(bySettingHour: s.hour ?? 0, minute: s.minute ?? 0, second: 0, of: day),
+              var newEnd = calendar.date(bySettingHour: e.hour ?? 0, minute: e.minute ?? 0, second: 0, of: day) else { return nil }
+        if newEnd < newStart { newEnd = calendar.date(byAdding: .day, value: 1, to: newEnd) ?? newEnd }
+        return (newStart, newEnd)
+    }
+
+    /// Các ngày cần tạo: mỗi tuần trong `weeks` tuần kể từ tuần của ca nguồn, ở các thứ đã chọn (0 = thứ Hai), sau ngày nguồn.
+    static func targetDays(from source: Date, weekdays: Set<Int>, weeks: Int, calendar: Calendar = .current) -> [Date] {
+        var cal = calendar
+        cal.firstWeekday = 2
+        let sourceDay = cal.startOfDay(for: source)
+        guard let monday = cal.dateInterval(of: .weekOfYear, for: sourceDay)?.start else { return [] }
+        var days: [Date] = []
+        for week in 0..<max(0, min(weeks, 12)) {
+            for weekday in weekdays.sorted() where (0..<7).contains(weekday) {
+                if let day = cal.date(byAdding: .day, value: week * 7 + weekday, to: monday), day > sourceDay { days.append(day) }
+            }
+        }
+        return days
+    }
+}
+
 @MainActor
 public struct ShiftManagementView: View {
-    @State private var weekOffset = 0
+    @State private var month = HopeCalendarMath.startOfMonth(.now)
     public init() {}
     public var body: some View {
-        var calendar = Calendar.current
-        calendar.firstWeekday = 2
-        let base = calendar.dateInterval(of: .weekOfYear, for: .now)?.start ?? calendar.startOfDay(for: .now)
-        let start = calendar.date(byAdding: .weekOfYear, value: weekOffset, to: base) ?? base
-        return NavigationStack {
-            HopeWeekView(weekStart: start, moveWeek: { weekOffset += $0 })
-                .id(start)
+        NavigationStack {
+            HopeMonthView(month: $month).id(month)
         }
     }
 }
 
 @MainActor
-private struct HopeWeekView: View {
+private struct HopeMonthView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dynamicTypeSize) private var typeSize
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query private var shifts: [ShiftConfig]
     @State private var selectedDate: Date
     @State private var showingEditor = false
@@ -30,48 +52,56 @@ private struct HopeWeekView: View {
     @State private var confirmEnd = false
     @State private var viewModel = ShiftDashboardViewModel()
     @State private var formName = ""
+    @State private var formDate = Date()
     @State private var formStart = Date()
     @State private var formEnd = Date()
     @State private var formNotes = ""
     @State private var formColor = "teal"
     @State private var formRoutineType = RoutineType.morning
     @State private var formError: String?
-    let weekStart: Date
-    let moveWeek: (Int) -> Void
+    @State private var repeatingShift: ShiftConfig?
+    @State private var repeatWeekdays: Set<Int> = []
+    @State private var repeatWeeks = 4
+    @Binding var month: Date
 
-    init(weekStart: Date, moveWeek: @escaping (Int) -> Void) {
-        self.weekStart = weekStart
-        self.moveWeek = moveWeek
-        let end = Calendar.current.date(byAdding: .day, value: 7, to: weekStart) ?? weekStart
-        _shifts = Query(filter: #Predicate<ShiftConfig> { $0.targetDate >= weekStart && $0.targetDate < end },
+    init(month: Binding<Date>) {
+        _month = month
+        let range = HopeCalendarMath.visibleRange(for: month.wrappedValue)
+        let start = range.start
+        let end = range.end
+        _shifts = Query(filter: #Predicate<ShiftConfig> { $0.targetDate >= start && $0.targetDate < end },
                         sort: [SortDescriptor(\ShiftConfig.startTime)])
-        _selectedDate = State(initialValue: Date.now >= weekStart && Date.now < end ? .now : weekStart)
+        let inMonth = Calendar.current.isDate(.now, equalTo: month.wrappedValue, toGranularity: .month)
+        _selectedDate = State(initialValue: inMonth ? .now : month.wrappedValue)
     }
 
-    private var days: [Date] {
-        (0..<7).compactMap { Calendar.current.date(byAdding: .day, value: $0, to: weekStart) }
-    }
-    private var workingShifts: [ShiftConfig] { shifts.filter { !$0.name.lowercased().contains("nghỉ") } }
-    private var dailyShifts: [ShiftConfig] {
-        shifts.filter { Calendar.current.isDate($0.targetDate, inSameDayAs: selectedDate) }
-    }
+    private var calendar: Calendar { Calendar.current }
+    private var monthShifts: [ShiftConfig] { shifts.filter { calendar.isDate($0.targetDate, equalTo: month, toGranularity: .month) } }
+    private var workingShifts: [ShiftConfig] { monthShifts.filter { !$0.name.lowercased().contains("nghỉ") } }
+    private var dailyShifts: [ShiftConfig] { shifts.filter { calendar.isDate($0.targetDate, inSameDayAs: selectedDate) } }
     private var hours: Double { workingShifts.reduce(0) { $0 + $1.durationHours } }
     private var freeDays: Int {
-        days.filter { day in !workingShifts.contains { Calendar.current.isDate($0.targetDate, inSameDayAs: day) } }.count
+        let total = calendar.range(of: .day, in: .month, for: month)?.count ?? 30
+        let worked = Set(workingShifts.map { calendar.startOfDay(for: $0.targetDate) }).count
+        return max(0, total - worked)
+    }
+    private var marks: [Date: [Color]] {
+        Dictionary(grouping: shifts, by: { calendar.startOfDay(for: $0.targetDate) })
+            .mapValues { $0.map { HopeTheme.shiftColor($0.colorTag) } }
     }
 
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 24) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Tuần của bạn.").font(.largeTitle.weight(.semibold)).tracking(-0.7)
+                    Text("Lịch của bạn.").font(.largeTitle.weight(.semibold)).tracking(-0.7)
                         .foregroundStyle(HopeTheme.ink)
-                    Text("Sắp xếp ca trực, chủ động mỗi ngày.")
+                    Text("Chạm một ngày để xem và chỉnh ca của ngày đó.")
                         .font(.subheadline).foregroundStyle(HopeTheme.secondary)
                 }
                 calendarCard
                 statistics
-                HopeSectionHeading(Calendar.current.isDateInToday(selectedDate) ? "Ca trực hôm nay" : "Ca trực trong ngày", count: dailyShifts.count)
+                HopeSectionHeading(calendar.isDateInToday(selectedDate) ? "Ca trực hôm nay" : "Ca trực trong ngày", count: dailyShifts.count)
                 if dailyShifts.isEmpty { emptyDay }
                 ForEach(dailyShifts) { shift in shiftCard(shift) }
             }
@@ -89,6 +119,7 @@ private struct HopeWeekView: View {
             }
         }
         .sheet(isPresented: $showingEditor) { editor }
+        .sheet(item: $repeatingShift) { shift in repeatSheet(shift) }
         .alert("Hope", isPresented: $viewModel.showAlert) {
             Button("Đóng", role: .cancel) {}
         } message: { Text(viewModel.alertMessage ?? "") }
@@ -103,63 +134,28 @@ private struct HopeWeekView: View {
     }
 
     private var calendarCard: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            HStack(spacing: 8) {
-                Button { moveWeek(-1) } label: {
-                    Image(systemName: "chevron.left").frame(width: 44, height: 44)
-                }.accessibilityLabel("Tuần trước")
-                Spacer(minLength: 0)
-                VStack(spacing: 3) {
-                    Text(weekStart, format: .dateTime.month(.wide).year())
-                        .font(.headline).foregroundStyle(HopeTheme.ink)
-                    if let end = days.last {
-                        Text("\(weekStart.formatted(.dateTime.day().month())) – \(end.formatted(.dateTime.day().month()))")
-                            .font(.caption).foregroundStyle(HopeTheme.secondary)
-                    }
-                }
-                Spacer(minLength: 0)
-                Button { moveWeek(1) } label: {
-                    Image(systemName: "chevron.right").frame(width: 44, height: 44)
-                }.accessibilityLabel("Tuần sau")
-            }.tint(HopeTheme.accent)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 4) {
-                    ForEach(days, id: \.self) { day in dayButton(day) }
-                }
+        VStack(alignment: .leading, spacing: 12) {
+            HopeMonthCalendar(month: $month, selected: [calendar.startOfDay(for: selectedDate)], marks: marks) { day in
+                selectedDate = day
             }
-            Text(selectedDate, format: .dateTime.weekday(.wide).day().month(.wide))
-                .font(.subheadline).foregroundStyle(HopeTheme.secondary)
+            HStack {
+                Text(selectedDate, format: .dateTime.weekday(.wide).day().month(.wide))
+                    .font(.subheadline).foregroundStyle(HopeTheme.secondary)
+                Spacer()
+                Button("Hôm nay") {
+                    selectedDate = .now
+                    month = HopeCalendarMath.startOfMonth(.now)
+                }.font(.subheadline.weight(.semibold)).tint(HopeTheme.accent)
+            }
         }.hopeCard()
-    }
-
-    private func dayButton(_ date: Date) -> some View {
-        let selected = Calendar.current.isDate(date, inSameDayAs: selectedDate)
-        let hasShift = shifts.contains { Calendar.current.isDate($0.targetDate, inSameDayAs: date) }
-        let weekday = Calendar.current.component(.weekday, from: date)
-        return Button {
-            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.15)) { selectedDate = date }
-        } label: {
-            VStack(spacing: 10) {
-                Text(weekday == 1 ? "CN" : "T\(weekday)").font(.caption.weight(.medium))
-                Text(date, format: .dateTime.day()).font(.headline.monospacedDigit())
-                Circle().fill(hasShift ? (selected ? HopeTheme.mint : HopeTheme.accent) : .clear)
-                    .frame(width: 4, height: 4)
-            }
-            .padding(.vertical, 12).frame(minWidth: 44)
-            .foregroundStyle(selected ? HopeTheme.onAccent : HopeTheme.ink)
-            .background(selected ? HopeTheme.accent : HopeTheme.surface, in: RoundedRectangle(cornerRadius: 18))
-            .fixedSize(horizontal: true, vertical: false)
-        }.buttonStyle(.plain)
-            .accessibilityLabel(date.formatted(date: .complete, time: .omitted))
-            .accessibilityValue(selected ? "Đang chọn" : (hasShift ? "Có ca trực" : "Chưa có ca"))
     }
 
     private var statistics: some View {
         let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 12)) : AnyLayout(HStackLayout(alignment: .top, spacing: 12))
         return layout {
-            stat(hours.formatted(.number.precision(.fractionLength(0...1))) + "h", title: "Giờ làm", symbol: "clock", color: HopeTheme.accent)
+            stat(hours.formatted(.number.precision(.fractionLength(0...1))) + "h", title: "Giờ làm trong tháng", symbol: "clock", color: HopeTheme.accent)
             stat(workingShifts.count.formatted(), title: "Ca trực", symbol: "calendar", color: HopeTheme.amber)
-            stat(freeDays.formatted(), title: "Chưa có ca", symbol: "leaf", color: HopeTheme.blue)
+            stat(freeDays.formatted(), title: "Ngày chưa có ca", symbol: "leaf", color: HopeTheme.blue)
         }
     }
 
@@ -187,12 +183,13 @@ private struct HopeWeekView: View {
                         .fixedSize(horizontal: false, vertical: true)
                     Text("\(shift.startTime.formatted(date: .omitted, time: .shortened)) – \(shift.endTime.formatted(date: .omitted, time: .shortened))")
                         .font(.subheadline.monospacedDigit()).foregroundStyle(HopeTheme.secondary)
-                    if !Calendar.current.isDate(shift.startTime, inSameDayAs: shift.endTime) {
+                    if !calendar.isDate(shift.startTime, inSameDayAs: shift.endTime) {
                         Text("Kết thúc vào ngày hôm sau").font(.caption).foregroundStyle(HopeTheme.amber)
                     }
                 }.frame(maxWidth: .infinity, alignment: .leading)
                 Menu {
                     Button("Chỉnh sửa ca", systemImage: "pencil") { openEditor(shift) }
+                    Button("Lặp lại ca…", systemImage: "repeat") { openRepeat(shift) }
                     if shift.isActive {
                         Button("Kết thúc ca", systemImage: "stop.circle", role: .destructive) {
                             endingShift = shift; confirmEnd = true
@@ -234,7 +231,7 @@ private struct HopeWeekView: View {
             Form {
                 Section {
                     TextField("Tên ca trực", text: $formName).textInputAutocapitalization(.sentences)
-                    LabeledContent("Ngày", value: (editingShift?.targetDate ?? selectedDate).formatted(date: .abbreviated, time: .omitted))
+                    DatePicker("Ngày", selection: $formDate, displayedComponents: .date)
                     Picker("Checklist theo loại ca", selection: $formRoutineType) {
                         ForEach(RoutineType.allCases) { Text($0.title).tag($0) }
                     }
@@ -272,14 +269,87 @@ private struct HopeWeekView: View {
         .presentationDetents([.large]).presentationDragIndicator(.visible)
     }
 
+    private func repeatSheet(_ shift: ShiftConfig) -> some View {
+        let names = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]
+        return NavigationStack {
+            Form {
+                Section {
+                    LabeledContent("Ca", value: shift.name)
+                    LabeledContent("Giờ", value: "\(shift.startTime.formatted(date: .omitted, time: .shortened)) – \(shift.endTime.formatted(date: .omitted, time: .shortened))")
+                    LabeledContent("Từ ngày", value: shift.targetDate.formatted(date: .abbreviated, time: .omitted))
+                }
+                Section {
+                    HStack(spacing: 6) {
+                        ForEach(names.indices, id: \.self) { index in
+                            let on = repeatWeekdays.contains(index)
+                            Button {
+                                if on { repeatWeekdays.remove(index) } else { repeatWeekdays.insert(index) }
+                            } label: {
+                                Text(names[index]).font(.subheadline.weight(on ? .semibold : .regular))
+                                    .frame(maxWidth: .infinity, minHeight: 44)
+                                    .foregroundStyle(on ? HopeTheme.onAccent : HopeTheme.ink)
+                                    .background(on ? HopeTheme.accent : HopeTheme.surfaceMuted, in: RoundedRectangle(cornerRadius: 12))
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityAddTraits(on ? .isSelected : [])
+                        }
+                    }
+                    Stepper("Số tuần: \(repeatWeeks)", value: $repeatWeeks, in: 1...8)
+                } header: { Text("Lặp vào các thứ") } footer: {
+                    Text("Những ngày đã có ca cùng tên và giờ sẽ được bỏ qua.")
+                }
+            }
+            .scrollContentBackground(.hidden).background(HopeTheme.background)
+            .navigationTitle("Lặp lại ca").navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Hủy") { repeatingShift = nil } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Tạo ca") { applyRepeat(shift) }.fontWeight(.semibold).disabled(repeatWeekdays.isEmpty)
+                }
+            }
+            .tint(HopeTheme.accent)
+        }
+        .presentationDetents([.medium, .large]).presentationDragIndicator(.visible)
+    }
+
+    private func openRepeat(_ shift: ShiftConfig) {
+        let weekday = calendar.component(.weekday, from: shift.targetDate)   // 1 = Chủ nhật
+        repeatWeekdays = [(weekday + 5) % 7]
+        repeatWeeks = 4
+        repeatingShift = shift
+    }
+
+    private func applyRepeat(_ source: ShiftConfig) {
+        var created = 0
+        for day in ShiftRepeat.targetDays(from: source.targetDate, weekdays: repeatWeekdays, weeks: repeatWeeks) {
+            guard let times = ShiftRepeat.rebased(start: source.startTime, end: source.endTime, to: day) else { continue }
+            let next = calendar.date(byAdding: .day, value: 1, to: day) ?? day
+            let sameDay = (try? context.fetch(FetchDescriptor<ShiftConfig>(
+                predicate: #Predicate { $0.targetDate >= day && $0.targetDate < next }))) ?? []
+            if sameDay.contains(where: { $0.name == source.name && $0.startTime == times.start && $0.endTime == times.end }) { continue }
+            let copy = ShiftConfig(name: source.name, startTime: times.start, endTime: times.end, isActive: false,
+                                   targetDate: day, pharmacistName: source.pharmacistName, colorTag: source.colorTag, notes: source.notes)
+            copy.routineType = source.routineType
+            context.insert(copy)
+            created += 1
+        }
+        do {
+            try context.save()
+            repeatingShift = nil
+            viewModel.refresh(context: context, startActivity: true)
+            if created == 0 { viewModel.alertMessage = "Không có ngày nào cần tạo thêm."; viewModel.showAlert = true }
+        } catch { context.rollback(); viewModel.report(error) }
+    }
+
     private func openEditor(_ shift: ShiftConfig?) {
         editingShift = shift
         formName = shift?.name ?? ""
+        formDate = shift?.targetDate ?? selectedDate
         formNotes = shift?.notes ?? ""
         formColor = shift?.colorTag ?? "teal"
         formRoutineType = shift?.routineType ?? .morning
-        formStart = shift?.startTime ?? Calendar.current.date(bySettingHour: 6, minute: 0, second: 0, of: selectedDate) ?? selectedDate
-        formEnd = shift?.endTime ?? Calendar.current.date(bySettingHour: 14, minute: 0, second: 0, of: selectedDate) ?? selectedDate
+        formStart = shift?.startTime ?? calendar.date(bySettingHour: 6, minute: 0, second: 0, of: selectedDate) ?? selectedDate
+        formEnd = shift?.endTime ?? calendar.date(bySettingHour: 14, minute: 0, second: 0, of: selectedDate) ?? selectedDate
         formError = nil
         showingEditor = true
     }
@@ -287,8 +357,7 @@ private struct HopeWeekView: View {
     private func saveShift() {
         let name = formName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !name.isEmpty else { return }
-        let calendar = Calendar.current
-        let date = editingShift?.targetDate ?? selectedDate
+        let date = calendar.startOfDay(for: formDate)
         let startParts = calendar.dateComponents([.hour, .minute], from: formStart)
         let endParts = calendar.dateComponents([.hour, .minute], from: formEnd)
         guard let start = calendar.date(bySettingHour: startParts.hour ?? 0, minute: startParts.minute ?? 0, second: 0, of: date),
@@ -299,12 +368,12 @@ private struct HopeWeekView: View {
         }
         if end < start { end = calendar.date(byAdding: .day, value: 1, to: end) ?? end }
         if let shift = editingShift {
-            shift.name = name; shift.startTime = start; shift.endTime = end
+            shift.name = name; shift.startTime = start; shift.endTime = end; shift.targetDate = date
             shift.colorTag = formColor; shift.notes = formNotes
             shift.routineType = formRoutineType; shift.updatedAt = .now
         } else {
             let shift = ShiftConfig(name: name, startTime: start, endTime: end, isActive: false,
-                                    targetDate: selectedDate, pharmacistName: "Tôi", colorTag: formColor, notes: formNotes)
+                                    targetDate: date, pharmacistName: "Tôi", colorTag: formColor, notes: formNotes)
             shift.routineType = formRoutineType
             context.insert(shift)
         }
@@ -312,13 +381,15 @@ private struct HopeWeekView: View {
             try context.save()
             showingEditor = false
             viewModel.refresh(context: context, startActivity: true)
+            selectedDate = date
+            if !calendar.isDate(date, equalTo: month, toGranularity: .month) { month = HopeCalendarMath.startOfMonth(date) }
         } catch { context.rollback(); formError = error.localizedDescription }
     }
 
     private func seedIfNeeded() {
         guard ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else { return }
         do {
-            // Check the whole store, not only the currently visible week.
+            // Check the whole store, not only the currently visible month.
             if try context.fetchCount(FetchDescriptor<ShiftConfig>()) == 0 {
                 for shift in ShiftConfig.defaultShifts() { context.insert(shift) }
                 try context.save()

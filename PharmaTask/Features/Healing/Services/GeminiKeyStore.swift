@@ -13,9 +13,29 @@ public enum GeminiKeyStore {
          kSecAttrAccount as String: account]
     }
 
+    /// Có khóa dùng được: khóa người dùng tự nhập, hoặc khóa dựng sẵn khi build.
     public static var hasKey: Bool { load() != nil }
+    public static var hasUserKey: Bool { loadUserKey() != nil }
+    /// Chỉ có khóa dựng sẵn, người dùng chưa nhập khóa riêng.
+    public static var usesBundledKey: Bool { loadUserKey() == nil && bundledKey != nil }
 
-    public static func load() -> String? {
+    /// Khóa dựng sẵn khi build: `GEMINI_API_KEY` trong `Config/Secrets.xcconfig` (không commit) hoặc secret của CI,
+    /// được ghi vào Info.plist dưới tên `HopeGeminiKey`. Rỗng hoặc chưa thay biến thì coi như không có.
+    /// Khóa này nằm trong gói app nên chỉ phát hành app cho chính chủ, và nên giới hạn khóa ở Google Cloud.
+    public static var bundledKey: String? {
+        guard let raw = Bundle.main.object(forInfoDictionaryKey: "HopeGeminiKey") as? String else { return nil }
+        return cleanBundled(raw)
+    }
+
+    static func cleanBundled(_ raw: String) -> String? {
+        let key = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        return key.isEmpty || key.contains("$(") ? nil : key
+    }
+
+    /// Ưu tiên khóa người dùng nhập; không có thì dùng khóa dựng sẵn.
+    public static func load() -> String? { loadUserKey() ?? bundledKey }
+
+    public static func loadUserKey() -> String? {
         migrateLegacyIfNeeded()
         var query = baseQuery
         query[kSecReturnData as String] = true

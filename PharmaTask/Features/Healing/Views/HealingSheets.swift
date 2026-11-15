@@ -70,8 +70,6 @@ struct HealingNoteView: View {
                             VStack(spacing: 14) {
                                 Image(systemName: "quote.opening").font(.title).foregroundStyle(HopeTheme.accent.opacity(0.6))
                                 RevealingText(text: note.text)
-                                Text(note.isAI ? "Viết riêng cho bạn · Gemini" : "Lời nhắn viết sẵn")
-                                    .font(.caption).foregroundStyle(HopeTheme.secondary)
                             }
                             .id(note.text)
                             .transition(.opacity)

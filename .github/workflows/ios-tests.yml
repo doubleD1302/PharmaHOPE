@@ -52,6 +52,7 @@ jobs:
             -scheme Hope \
             -destination "id=${{ steps.sim.outputs.udid }}" \
             -resultBundlePath build/HopeTests.xcresult \
+            GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \

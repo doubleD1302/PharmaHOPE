@@ -7,6 +7,7 @@ final class HopeAppDelegate: NSObject, UIApplicationDelegate, UNUserNotification
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         NotificationScheduler.shared.registerActions()
+        Task.detached(priority: .utility) { BellMelody.installSounds() }   // tổng hợp ba tệp chuông một lần, dùng cho thông báo
         return true
     }
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,

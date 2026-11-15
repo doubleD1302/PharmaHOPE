@@ -1,0 +1,7 @@
+// Cấu hình chung của target Hope.
+// GEMINI_API_KEY: khóa Gemini dựng sẵn vào app để người dùng không phải cài đặt.
+//  - Máy bạn: tạo Config/Secrets.xcconfig (đã nằm trong .gitignore) với một dòng: GEMINI_API_KEY = <khóa>
+//  - CI: truyền GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" cho xcodebuild (xem .github/workflows).
+// Để trống thì app tự dùng chế độ người dùng nhập khóa trong Cài đặt.
+GEMINI_API_KEY =
+#include? "Secrets.xcconfig"

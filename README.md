@@ -63,3 +63,24 @@ Model được chọn tự động trong `GeminiClient.swift`: ứng dụng hỏ
 SwiftUI, SwiftData, WidgetKit và Shortcuts là phần dành riêng iOS. Bản web hiện chỉ là mô phỏng. Khi làm Android, cần dùng lại quy tắc phân ca, định dạng công việc và bộ màu/chữ, rồi xây giao diện và tích hợp thông báo Android tương ứng; không coi web preview là app Android hoàn chỉnh.
 
 Nếu không mở được cơ sở dữ liệu (ví dụ nâng cấp schema lỗi), app không crash và không xoá gì: nó chạy bằng kho tạm trong bộ nhớ và hiện thông báo; tệp dữ liệu cũ giữ nguyên trên máy. Lời gọi Gemini có ngân sách thời gian tổng 15 giây, quá hạn thì dùng nội dung viết sẵn.
+
+## Tab Hope, lịch và khóa Gemini dựng sẵn
+
+- Tab Hope là một cảnh toàn màn hình với tranh vườn phủ kín, vuốt ngang giữa 5 trang: Vườn (thỏ, chim sẻ hoặc con vật bạn chọn cùng Hope, câu trích của vườn), Cảm xúc, Nghỉ và nghe (thở, âm thanh nền), Viết (nhật ký, khép ngày) và Trò chuyện. Không trang nào cuộn dọc khi đủ chỗ; màn hình quá thấp thì trang đó mới cuộn.
+- Trò chuyện với Hope và các con vật dùng Gemini trong vai nhân vật; chỉ mở sau khi bạn đồng ý một lần, và quay về lời viết sẵn khi không có khóa hoặc lỗi. Lịch sử lưu trên máy (UserDefaults). Mỗi nhân vật có tính cách và cách nói riêng (Thỏ nhút nhát, nói nhỏ, hỏi một câu nhẹ; Chim sẻ tinh nghịch, hay "Chiếp!", rủ làm một việc nhỏ ngay; Hope điềm tĩnh như cây), cả khi dùng Gemini lẫn lời viết sẵn.
+- Gemini được chờ tối đa 90 giây khi trò chuyện (lời gọi khác vẫn 15 giây). Trong lúc chờ hiện "đang suy nghĩ" (ba chấm nhấp nháy, nhãn đổi theo thời gian chờ, nút "Không đợi nữa" sau 12 giây), rồi câu trả lời hiện từng chữ với dòng "đang nhập…". Giao diện không gắn nhãn Gemini để nhập vai; lời giải thích về dữ liệu gửi đi vẫn nằm ở màn đồng ý và Cài đặt.
+- Thỏ và Chim sẻ đi lại trên lối mòn lát đá của bức tranh nền, cả ngang lẫn lên xuống dọc theo đường mòn: nhảy từng bước ngắn, đứng nghỉ, quay đầu theo hướng đi, xa thì nhỏ hơn, có bóng đổ dưới chân. Lối mòn (`Features/Garden/GardenPath.swift`) được chiếu lên màn hình đúng như cách ảnh nền phủ kín, và chỉ lấy đoạn nằm trong khung nhìn nên màn hình rộng hay hẹp thú cũng không ra khỏi đá. Nút điều khiển nằm phía trên để phần dưới trang dành cho lối mòn. Giảm chuyển động hoặc chế độ nghỉ thì đứng yên; loài bay giữ nguyên chỗ.
+- Câu trích đầu vườn là 24 câu có thật về nỗ lực, kiên trì, tự chủ, lạc quan và mạnh mẽ (Wikiquote, tục ngữ Việt Nam), có tác giả, đã đối chiếu nguyên văn; không dùng những câu hay bị gán nhầm. Lời Việt do mình dịch.
+- Phiên thở có hiệu ứng nhiều lớp: quả cầu đổi màu theo pha (hít vào xanh bạc hà, giữ vàng nhạt, thở ra xanh trời), sóng lan ra khi thở ra và thu vào khi hít vào, bụi sáng trôi vào rồi toả ra, vòng tiến độ và số giây còn lại.
+- Lịch ca là lịch tháng: chạm một ngày để xem, thêm, sửa hoặc đổi ngày của ca; menu của ca có "Lặp lại ca…" để tạo ca cho các thứ đã chọn trong nhiều tuần. Tra cứu có lịch chọn khoảng ngày tạo việc, chấm dưới ngày có việc.
+- Khóa Gemini dựng sẵn: app đọc khóa từ Info.plist (`HopeGeminiKey = $(GEMINI_API_KEY)`), nên người dùng không phải cài đặt. Khóa riêng nhập trong Cài đặt vẫn được ưu tiên.
+  - Máy có Xcode: tạo `Config/Secrets.xcconfig` (đã nằm trong `.gitignore`) với dòng `GEMINI_API_KEY = <khóa>`.
+  - CI trên GitHub: thêm secret `GEMINI_API_KEY` ở Settings → Secrets and variables → Actions. Hai workflow đã truyền secret này cho xcodebuild; thiếu secret thì khóa để trống và app yêu cầu nhập khóa.
+  - Khóa nằm trong gói app nên ai có file IPA đều trích được. Chỉ phát hành app cho chính bạn, và hãy giới hạn khóa trong Google Cloud (chỉ API Generative Language, đặt hạn mức).
+- Bản web thử toàn app nằm ở `DesignAssets/healing/web-test` (xem `build.py`). Khóa mặc định của bản web đặt trong `config.local.json` cạnh trang (đã bị `.gitignore`).
+
+## Chuông báo
+
+- Nút chuông (huy hiệu số thông báo chưa đọc, đỏ khi có việc quá hạn) nằm trên thanh của Hôm nay và của tab Hope. Chạm để mở hộp thông báo: việc đang cần chú ý, nút Xong và Hoãn 10 hoặc 15 phút ngay trong hộp, công tắc âm chuông, nút thử chuông.
+- Báo khi: việc sắp đến hạn (theo số phút nhắc trước), đến hạn, quá hạn (nằm đó đến khi xong hoặc hoãn), đến giờ nhắc lại sau khi hoãn; sắp đến ca (30 phút trước), đến giờ mà chưa bắt đầu ca; còn 30 và 15 phút hết ca khi còn việc, ca đã hết giờ mà còn việc; nhắc nghỉ một phút sau 14:00 nếu chưa ghé vườn; nhắc khép lại hôm nay sau 21:00. Bản web còn nhắc sao lưu.
+- Chuông có giai điệu, mỗi loại một đoạn nhạc dài khoảng 5 đến 8 giây: nhẹ nhàng (sắp đến hạn, sắp đến ca), vui sáng rải hợp âm Đô trưởng (đến hạn), dồn dập trên thang La thứ (quá hạn, sắp hết ca). Trên iOS chuông được tổng hợp bằng mã thành tệp WAV (`Shared/Services/BellMelody.swift`), đặt vào Library/Sounds làm âm thông báo hệ thống, nên thông báo vẫn kêu bằng giai điệu khi app đóng; thông báo mới cho ca trực nằm trong `ShiftNotificationPlan`. Nhắc khép lại hôm nay lúc 21:00 mỗi ngày là tuỳ chọn trong hộp thông báo (mặc định tắt).

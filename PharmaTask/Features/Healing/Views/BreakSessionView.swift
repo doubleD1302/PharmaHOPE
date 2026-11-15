@@ -2,10 +2,21 @@ import SwiftUI
 import SwiftData
 import UIKit
 
-/// Quả cầu thở. Kích thước tính trực tiếp từ thời gian đã trôi qua nên chuyển động liên tục, không bước nhảy.
+/// Quả cầu thở. Mọi thứ tính trực tiếp từ thời gian đã trôi qua nên chuyển động liên tục, không bước nhảy.
+/// Hiệu ứng: quả cầu phình và thu theo nhịp, đổi màu theo từng pha (hít vào xanh bạc hà, giữ vàng nhạt, thở ra xanh trời),
+/// vòng sóng lan ra khi thở ra và thu vào khi hít vào, bụi sáng trôi về phía quả cầu rồi toả ra,
+/// vòng tiến độ quanh quả cầu và số giây còn lại của pha.
 struct BreathingOrb: View {
     let startDate: Date
     var reduceMotion: Bool
+
+    enum Phase: Equatable { case inhale, hold, exhale }
+    struct PhaseState: Equatable {
+        let phase: Phase
+        let secondsLeft: Int
+        let cycle: Double      // tiến độ trong cả vòng 10 giây, 0 đến 1
+        let phaseTime: Double  // đã trôi qua bao lâu trong pha hiện tại
+    }
 
     /// 0 = thở ra hết, 1 = hít vào đầy. Hít vào nhẹ nhàng, giữ ngắn, thở ra dài hơn.
     static func breath(at elapsed: Double) -> Double {
@@ -17,10 +28,78 @@ struct BreathingOrb: View {
         return 1 - healingEase((x - cycle.inhale - cycle.hold) / cycle.exhale)
     }
 
+    static func state(at elapsed: Double) -> PhaseState {
+        let cycle = HealingContent.breathCycle
+        let total = cycle.inhale + cycle.hold + cycle.exhale
+        let x = max(elapsed, 0).truncatingRemainder(dividingBy: total)
+        if x < cycle.inhale {
+            return PhaseState(phase: .inhale, secondsLeft: Int((cycle.inhale - x).rounded(.up)), cycle: x / total, phaseTime: x)
+        }
+        if x < cycle.inhale + cycle.hold {
+            return PhaseState(phase: .hold, secondsLeft: Int((cycle.inhale + cycle.hold - x).rounded(.up)), cycle: x / total, phaseTime: x - cycle.inhale)
+        }
+        return PhaseState(phase: .exhale, secondsLeft: Int((total - x).rounded(.up)), cycle: x / total, phaseTime: x - cycle.inhale - cycle.hold)
+    }
+
+    typealias RGB = (r: Double, g: Double, b: Double)
+
+    static func rgb(_ phase: Phase) -> RGB {
+        switch phase {
+        case .inhale: return (0.66, 0.85, 0.71)   // xanh bạc hà
+        case .hold: return (0.93, 0.78, 0.60)     // vàng nhạt
+        case .exhale: return (0.61, 0.78, 0.88)   // xanh trời
+        }
+    }
+
+    /// Màu của pha hiện tại, đổi mượt từ màu pha trước trong 0,6 giây đầu.
+    static func tint(at elapsed: Double) -> RGB {
+        let now = state(at: elapsed)
+        let previous = state(at: max(0, elapsed - now.phaseTime - 0.01)).phase
+        let from = rgb(previous), to = rgb(now.phase)
+        let f = elapsed < 0.6 ? 1 : min(1, now.phaseTime / 0.6)
+        return (from.r + (to.r - from.r) * f, from.g + (to.g - from.g) * f, from.b + (to.b - from.b) * f)
+    }
+
+    /// Các vòng sóng đang lan: loại (-1 thu vào khi hít vào, 0 nhịp khi giữ, 1 lan ra khi thở ra) và tiến độ 0 đến 1 trong 3 giây.
+    static func ripples(at elapsed: Double) -> [(kind: Int, progress: Double)] {
+        let cycle = HealingContent.breathCycle
+        let total = cycle.inhale + cycle.hold + cycle.exhale
+        let starts: [(Double, Int)] = [(0, -1), (cycle.inhale, 0), (cycle.inhale + cycle.hold, 1)]
+        let firstCycle = Int(floor(max(0, elapsed - 3) / total))
+        let lastCycle = Int(floor(max(0, elapsed) / total))
+        var result: [(kind: Int, progress: Double)] = []
+        for k in firstCycle...lastCycle {
+            for (offset, kind) in starts {
+                let start = Double(k) * total + offset
+                let age = elapsed - start
+                if age >= 0 && age < 3 { result.append((kind: kind, progress: age / 3)) }
+            }
+        }
+        return result
+    }
+
+    private static func color(_ value: RGB, opacity: Double = 1) -> Color {
+        Color(.sRGB, red: value.r, green: value.g, blue: value.b, opacity: opacity)
+    }
+
     var body: some View {
         TimelineView(.animation(minimumInterval: 1.0 / 60.0, paused: reduceMotion)) { timeline in
-            let b = reduceMotion ? 0.5 : Self.breath(at: timeline.date.timeIntervalSince(startDate))
-            orb(b)
+            let elapsed = reduceMotion ? 0 : timeline.date.timeIntervalSince(startDate)
+            let b = reduceMotion ? 0.5 : Self.breath(at: elapsed)
+            let state = Self.state(at: elapsed)
+            let tint = Self.tint(at: elapsed)
+            ZStack {
+                if !reduceMotion {
+                    Canvas { context, size in draw(&context, size: size, elapsed: elapsed, b: b, state: state, tint: tint) }
+                        .frame(width: 400, height: 400)
+                }
+                orb(b, tint: tint)
+                Text("\(state.secondsLeft)")
+                    .font(.system(size: 40, weight: .medium, design: .rounded).monospacedDigit())
+                    .foregroundStyle(Color.healing(0x0F3A31).opacity(reduceMotion ? 0 : 0.9))
+                    .contentTransition(.numericText())
+                    .animation(.easeInOut(duration: 0.25), value: state.secondsLeft)
+            }
         }
         .frame(width: 280, height: 280)
         .accessibilityElement()
@@ -28,10 +107,53 @@ struct BreathingOrb: View {
         .accessibilityHint("Phình ra khi hít vào, thu lại khi thở ra")
     }
 
-    private func orb(_ b: Double) -> some View {
+    private func draw(_ context: inout GraphicsContext, size: CGSize, elapsed: Double, b: Double, state: PhaseState, tint: RGB) {
+        let center = CGPoint(x: size.width / 2, y: size.height / 2)
+        let radius = 90.0
+        let orbRadius = radius * (0.58 + 0.42 * b)
+        // Bụi sáng: trôi vào gần quả cầu khi hít vào, toả ra xa khi thở ra.
+        for index in 0..<56 {
+            let h1 = healingHash(Double(index)), h2 = healingHash(Double(index) + 100)
+            let h3 = healingHash(Double(index) + 200), h4 = healingHash(Double(index) + 300)
+            let angle = h1 * 2 * .pi + elapsed * (h2 - 0.5) * 0.22
+            let distance = (radius * 1.25 + h3 * radius * 0.8) * (1.1 - 0.4 * b)
+            let twinkle = max(0, 0.3 + 0.4 * sin(elapsed * 1.6 + h4 * 6.28))
+            let sz = 1 + h2 * 2.4
+            let point = CGPoint(x: center.x + cos(angle) * distance, y: center.y + sin(angle) * distance * 0.9)
+            context.fill(Path(ellipseIn: CGRect(x: point.x - sz, y: point.y - sz, width: sz * 2, height: sz * 2)),
+                         with: .color(Self.color(tint, opacity: twinkle)))
+        }
+        // Vòng sóng.
+        for ripple in Self.ripples(at: elapsed) {
+            let u = ripple.progress
+            let ring: (rad: Double, alpha: Double)
+            switch ripple.kind {
+            case 1: ring = (orbRadius * (1 + 1.3 * u), 0.5 * (1 - u))
+            case -1: ring = (orbRadius * (2.4 - 1.3 * u), 0.5 * sin(.pi * u))
+            default: ring = (orbRadius * (1 + 0.3 * u), 0.55 * (1 - u))
+            }
+            let rad = ring.rad, alpha = ring.alpha
+            context.stroke(Path(ellipseIn: CGRect(x: center.x - rad, y: center.y - rad, width: rad * 2, height: rad * 2)),
+                           with: .color(Self.color(tint, opacity: alpha)), lineWidth: 2)
+        }
+        // Vòng tiến độ của cả chu kỳ thở.
+        let arcRadius = radius * 1.12 + 6
+        var arcContext = context
+        arcContext.translateBy(x: center.x, y: center.y)
+        arcContext.rotate(by: .degrees(-90))
+        let circle = Path(ellipseIn: CGRect(x: -arcRadius, y: -arcRadius, width: arcRadius * 2, height: arcRadius * 2))
+        arcContext.stroke(circle, with: .color(Color.white.opacity(0.14)), lineWidth: 3)
+        arcContext.stroke(circle.trimmedPath(from: 0, to: max(0.001, state.cycle)), with: .color(Self.color(tint, opacity: 0.95)),
+                          style: StrokeStyle(lineWidth: 3, lineCap: .round))
+        let endAngle = -Double.pi / 2 + 2 * .pi * state.cycle
+        let dot = CGPoint(x: center.x + cos(endAngle) * arcRadius, y: center.y + sin(endAngle) * arcRadius)
+        context.fill(Path(ellipseIn: CGRect(x: dot.x - 4.5, y: dot.y - 4.5, width: 9, height: 9)), with: .color(.white))
+    }
+
+    private func orb(_ b: Double, tint: RGB) -> some View {
         ZStack {
             Circle()
-                .fill(RadialGradient(colors: [Color.healing(0xA8D8B5, opacity: 0.42), .clear],
+                .fill(RadialGradient(colors: [Self.color(tint, opacity: 0.42), .clear],
                                      center: .center, startRadius: 20, endRadius: 150))
                 .frame(width: 280, height: 280)
                 .scaleEffect(0.78 + 0.24 * b)
@@ -45,16 +167,12 @@ struct BreathingOrb: View {
                 .scaleEffect(0.66 + 0.28 * b)
             Circle()
                 .fill(RadialGradient(colors: [Color.healing(0xEAF7E5, opacity: 0.96),
-                                              Color.healing(0xA8D8B5, opacity: 0.88),
-                                              Color.healing(0x4F9C84, opacity: 0.82)],
+                                              Self.color(tint, opacity: 0.88),
+                                              Self.color((tint.r * 0.45, tint.g * 0.65, tint.b * 0.6), opacity: 0.84)],
                                      center: UnitPoint(x: 0.4, y: 0.35), startRadius: 4, endRadius: 130))
                 .frame(width: 180, height: 180)
                 .scaleEffect(0.58 + 0.42 * b)
-                .shadow(color: Color.healing(0xA8D8B5, opacity: 0.55), radius: 12 + 28 * b)
-            Image(systemName: "leaf.fill")
-                .font(.system(size: 34, weight: .regular))
-                .foregroundStyle(Color.white.opacity(0.85))
-                .scaleEffect(0.75 + 0.35 * b)
+                .shadow(color: Self.color(tint, opacity: 0.55), radius: 12 + 28 * b)
         }
     }
 }

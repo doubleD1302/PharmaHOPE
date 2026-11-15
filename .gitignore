@@ -9,3 +9,7 @@ xcuserdata/
 .DS_Store
 Thumbs.db
 __pycache__/
+
+# Khóa API và cấu hình riêng, không bao giờ commit
+Config/Secrets.xcconfig
+**/config.local.json

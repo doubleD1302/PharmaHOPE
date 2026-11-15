@@ -7,7 +7,8 @@ public struct HealingNote: Equatable, Sendable {
 
 /// Mọi chỗ Hope dùng AI. Quy tắc dữ liệu:
 /// - Mặc định chỉ gửi cảm xúc đã chọn, buổi trong ngày hoặc số lượng. Không gửi tên việc hay nhật ký.
-/// - Duy nhất `reflection` gửi nội dung người dùng viết, và giao diện phải xin đồng ý trước mỗi lần.
+/// - `reflection` gửi nội dung nhật ký, và giao diện phải xin đồng ý trước mỗi lần.
+/// - `chat` (trò chuyện với nhân vật, trong HealingAI+Companions.swift) gửi những gì bạn gõ trong khung chat, sau khi bạn đồng ý một lần.
 /// Thiếu khóa, mất mạng hay lỗi API đều quay về nội dung viết sẵn, không bao giờ báo lỗi ra giữa trải nghiệm.
 public enum HealingAI {
     static let persona = """
