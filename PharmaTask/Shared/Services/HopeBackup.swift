@@ -62,17 +62,34 @@ public struct RoutineBackupRecord: Codable, Sendable {
     }
 }
 
-public struct ImportBackupRecord: Codable, Sendable {
-    public var id, sourceText, sourceLabel: String
-    public var shiftID: String?
+public struct MoodBackupRecord: Codable, Sendable {
+    public var id, moodRaw: String
     public var createdAt: Date
-    public var drafts: [TaskDraft]
-    public init(_ pending: PendingTaskImport) throws {
-        id = pending.id; sourceText = pending.sourceText; sourceLabel = pending.sourceLabel; shiftID = pending.shiftID
-        createdAt = pending.createdAt; drafts = try pending.drafts()
+    public init(_ mood: MoodCheckIn) { id = mood.id; moodRaw = mood.moodRaw; createdAt = mood.createdAt }
+}
+
+public struct JournalBackupRecord: Codable, Sendable {
+    public var id, kindRaw, prompt, text: String
+    public var createdAt, updatedAt: Date
+    public init(_ entry: JournalEntry) {
+        id = entry.id; kindRaw = entry.kindRaw; prompt = entry.prompt; text = entry.text
+        createdAt = entry.createdAt; updatedAt = entry.updatedAt
+    }
+    public func apply(to entry: JournalEntry) {
+        entry.kindRaw = kindRaw; entry.prompt = prompt; entry.text = text
+        entry.createdAt = createdAt; entry.updatedAt = updatedAt
     }
 }
 
+public struct VisitBackupRecord: Codable, Sendable {
+    public var id, kindRaw: String
+    public var minutes: Int
+    public var createdAt: Date
+    public init(_ visit: HealingVisit) { id = visit.id; kindRaw = visit.kindRaw; minutes = visit.minutes; createdAt = visit.createdAt }
+}
+
+/// Tệp sao lưu cũ có thể còn khóa `imports` (bản nháp AI đã gỡ bỏ); khóa này được bỏ qua khi đọc.
+/// `moods`, `journal`, `visits` là phần dữ liệu Vườn; tệp cũ không có các khóa này vẫn đọc được.
 public struct HopeBackup: Codable, Sendable {
     public static let maximumBytes = 10 * 1024 * 1024
     public var app = "Hope"
@@ -81,7 +98,9 @@ public struct HopeBackup: Codable, Sendable {
     public var tasks: [TaskBackupRecord]
     public var shifts: [ShiftBackupRecord]
     public var routines: [RoutineBackupRecord]
-    public var imports: [ImportBackupRecord]
+    public var moods: [MoodBackupRecord]? = nil
+    public var journal: [JournalBackupRecord]? = nil
+    public var visits: [VisitBackupRecord]? = nil
 
     public func encoded() throws -> Data {
         try validate()
@@ -113,8 +132,25 @@ public struct HopeBackup: Codable, Sendable {
         func validText(_ title: String, _ notes: String?) -> Bool {
             !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && title.count <= 500 && (notes?.count ?? 0) <= 20_000
         }
-        guard validIDs(tasks.map(\.id)), validIDs(shifts.map(\.id)), validIDs(routines.map(\.id)), validIDs(imports.map(\.id)), validDate(exportedAt) else {
+        guard validIDs(tasks.map(\.id)), validIDs(shifts.map(\.id)), validIDs(routines.map(\.id)), validDate(exportedAt),
+              validIDs((moods ?? []).map(\.id)), validIDs((journal ?? []).map(\.id)), validIDs((visits ?? []).map(\.id)) else {
             throw HopeDataError.invalid("Tệp có ID trùng, ID không hợp lệ hoặc số bản ghi vượt giới hạn.")
+        }
+        for mood in moods ?? [] {
+            guard HopeMood(rawValue: mood.moodRaw) != nil, validDate(mood.createdAt) else {
+                throw HopeDataError.invalid("Tệp có lần chọn cảm xúc không hợp lệ. Chưa nhập dữ liệu.")
+            }
+        }
+        for entry in journal ?? [] {
+            guard JournalKind(rawValue: entry.kindRaw) != nil, entry.prompt.count <= 2_000, entry.text.count <= 50_000,
+                  validDate(entry.createdAt), validDate(entry.updatedAt) else {
+                throw HopeDataError.invalid("Tệp có bài nhật ký không hợp lệ. Chưa nhập dữ liệu.")
+            }
+        }
+        for visit in visits ?? [] {
+            guard HealingVisitKind(rawValue: visit.kindRaw) != nil, (0...1_440).contains(visit.minutes), validDate(visit.createdAt) else {
+                throw HopeDataError.invalid("Tệp có lượt ghé vườn không hợp lệ. Chưa nhập dữ liệu.")
+            }
         }
         for task in tasks {
             guard validText(task.title, task.notes), TaskPriority(rawValue: task.priorityRaw) != nil,
@@ -140,16 +176,6 @@ public struct HopeBackup: Codable, Sendable {
                 throw HopeDataError.invalid("Tệp có mẫu checklist không hợp lệ. Chưa nhập dữ liệu.")
             }
         }
-        for pending in imports {
-            guard validDate(pending.createdAt), pending.sourceText.count <= 200_000, pending.sourceLabel.count <= 500, pending.drafts.count <= 200,
-                  validIDs(pending.drafts.map(\.id)) else { throw HopeDataError.invalid("Tệp có bản nháp AI không hợp lệ.") }
-            // Unselected drafts may intentionally contain unfinished edits; preserve them for review.
-            for draft in pending.drafts {
-                guard draft.title.count <= 500, draft.notes.count <= 20_000, TaskPriority(rawValue: draft.priorityRaw) != nil else {
-                    throw HopeDataError.invalid("Bản nháp vượt giới hạn hoặc có mức ưu tiên không hợp lệ.")
-                }
-            }
-        }
     }
     public static func readFile(_ url: URL) throws -> Self {
         let scoped = url.startAccessingSecurityScopedResource()
@@ -169,11 +195,17 @@ public struct BackupMergeSummary {
 
 @MainActor
 public enum HopeBackupService {
-    public static func snapshot(context: ModelContext) throws -> HopeBackup {
-        HopeBackup(tasks: try context.fetch(FetchDescriptor<TaskItem>()).map(TaskBackupRecord.init),
+    /// `includeGarden`: kèm cảm xúc, nhật ký và lượt ghé vườn. Tệp xuất ra không mã hoá nên nhật ký nằm nguyên văn trong đó.
+    public static func snapshot(context: ModelContext, includeGarden: Bool = true) throws -> HopeBackup {
+        var archive = HopeBackup(tasks: try context.fetch(FetchDescriptor<TaskItem>()).map(TaskBackupRecord.init),
             shifts: try context.fetch(FetchDescriptor<ShiftConfig>()).map(ShiftBackupRecord.init),
-            routines: try context.fetch(FetchDescriptor<RoutineTemplate>()).map(RoutineBackupRecord.init),
-            imports: try context.fetch(FetchDescriptor<PendingTaskImport>()).map { try ImportBackupRecord($0) })
+            routines: try context.fetch(FetchDescriptor<RoutineTemplate>()).map(RoutineBackupRecord.init))
+        if includeGarden {
+            archive.moods = try context.fetch(FetchDescriptor<MoodCheckIn>()).map(MoodBackupRecord.init)
+            archive.journal = try context.fetch(FetchDescriptor<JournalEntry>()).map(JournalBackupRecord.init)
+            archive.visits = try context.fetch(FetchDescriptor<HealingVisit>()).map(VisitBackupRecord.init)
+        }
+        return archive
     }
     public static func merge(_ archive: HopeBackup, context: ModelContext, updateLibraryPreference: Bool = true) throws -> BackupMergeSummary {
         try archive.validate() // Validation is complete before any model is changed.
@@ -181,7 +213,6 @@ public enum HopeBackupService {
         let tasks = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<TaskItem>()).map { ($0.id, $0) })
         let shifts = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<ShiftConfig>()).map { ($0.id, $0) })
         let routines = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<RoutineTemplate>()).map { ($0.id, $0) })
-        let imports = Set(try context.fetch(FetchDescriptor<PendingTaskImport>()).map(\.id))
         do {
             for record in archive.shifts {
                 if let shift = shifts[record.id] {
@@ -210,16 +241,25 @@ public enum HopeBackupService {
                     record.apply(to: routine); context.insert(routine); summary.inserted += 1
                 }
             }
-            for record in archive.imports {
-                if imports.contains(record.id) { summary.kept += 1; continue }
-                let batchID = record.id
-                if try context.fetchCount(FetchDescriptor<TaskItem>(predicate: #Predicate { $0.importBatchID == batchID })) > 0 {
-                    summary.kept += 1; continue
+            let moodIDs = Set(try context.fetch(FetchDescriptor<MoodCheckIn>()).map(\.id))
+            for record in archive.moods ?? [] where !moodIDs.contains(record.id) {
+                let mood = MoodCheckIn(mood: HopeMood(rawValue: record.moodRaw) ?? .okay, createdAt: record.createdAt)
+                mood.id = record.id; context.insert(mood); summary.inserted += 1
+            }
+            let entries = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<JournalEntry>()).map { ($0.id, $0) })
+            for record in archive.journal ?? [] {
+                if let entry = entries[record.id] {
+                    if record.updatedAt > entry.updatedAt { record.apply(to: entry); summary.updated += 1 }
+                    else { summary.kept += 1 }
+                } else {
+                    let entry = JournalEntry(kind: JournalKind(rawValue: record.kindRaw) ?? .free, prompt: record.prompt, text: record.text, createdAt: record.createdAt)
+                    entry.id = record.id; entry.updatedAt = record.updatedAt; context.insert(entry); summary.inserted += 1
                 }
-                let pending = try PendingTaskImport(sourceText: record.sourceText, sourceLabel: record.sourceLabel,
-                    shiftID: record.shiftID, drafts: record.drafts)
-                pending.id = record.id; pending.createdAt = record.createdAt
-                context.insert(pending); summary.inserted += 1
+            }
+            let visitIDs = Set(try context.fetch(FetchDescriptor<HealingVisit>()).map(\.id))
+            for record in archive.visits ?? [] where !visitIDs.contains(record.id) {
+                let visit = HealingVisit(kind: HealingVisitKind(rawValue: record.kindRaw) ?? .checkIn, minutes: record.minutes, createdAt: record.createdAt)
+                visit.id = record.id; context.insert(visit); summary.inserted += 1
             }
             try context.save() // One atomic persistence save; no partial import on validation failure.
             if updateLibraryPreference { RoutineChecklistService.markInitialized() }

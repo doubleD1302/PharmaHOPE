@@ -45,30 +45,6 @@ final class PersonalFeaturesTests: XCTestCase {
         try TaskCommands.complete(task, completed: false, context: context)
         XCTAssertNil(task.completedAt)
     }
-    func testAIStageDoesNotCreateTasksAndCommitKeepsSelectedEdits() throws {
-        let context = try context()
-        let pending = try TaskImportService.stage(tasks: [TaskItem(title: "AI một"), TaskItem(title: "AI hai")],
-            source: "Nguồn giữ nguyên dấu: quỹ, dược sĩ", label: "Test", shiftID: nil, context: context)
-        let batch = pending.id
-        XCTAssertEqual(try context.fetchCount(FetchDescriptor<TaskItem>()), 0)
-        var drafts = try pending.drafts()
-        drafts[0].title = "Tên đã duyệt"; drafts[1].isSelected = false
-        XCTAssertEqual(try TaskImportService.commit(pending, drafts: drafts, shiftID: nil, context: context), 1)
-        let saved = try XCTUnwrap(context.fetch(FetchDescriptor<TaskItem>()).first)
-        XCTAssertEqual(saved.title, "Tên đã duyệt")
-        XCTAssertEqual(saved.importBatchID, batch)
-        XCTAssertEqual(saved.sourceText, "Nguồn giữ nguyên dấu: quỹ, dược sĩ")
-        XCTAssertEqual(try context.fetchCount(FetchDescriptor<PendingTaskImport>()), 0)
-    }
-    func testInvalidAISelectionLeavesDraftAndCreatesNoPartialTasks() throws {
-        let context = try context()
-        let pending = try TaskImportService.stage(tasks: [TaskItem(title: "Hợp lệ"), TaskItem(title: "Sửa sau")],
-            source: "nguồn", label: "Test", shiftID: nil, context: context)
-        var drafts = try pending.drafts(); drafts[1].dueTime = "25:80"
-        XCTAssertThrowsError(try TaskImportService.commit(pending, drafts: drafts, shiftID: nil, context: context))
-        XCTAssertEqual(try context.fetchCount(FetchDescriptor<TaskItem>()), 0)
-        XCTAssertEqual(try context.fetchCount(FetchDescriptor<PendingTaskImport>()), 1)
-    }
     func testChecklistInstancesHaveIndependentCompletionAndAreNotReapplied() throws {
         let context = try context()
         let template = RoutineTemplate(title: "Kiểm quỹ", type: .morning)
@@ -187,13 +163,43 @@ final class PersonalFeaturesTests: XCTestCase {
         _ = try HopeBackupService.merge(archive, context: target, updateLibraryPreference: false)
         XCTAssertEqual(local.title, "Bản mới"); XCTAssertNotNil(local.deletedAt)
     }
-    func testRestoringOldDraftDoesNotReplayAlreadyApprovedBatch() throws {
-        let context = try context()
-        let pending = try TaskImportService.stage(tasks: [TaskItem(title: "Một việc")], source: "Nguồn", label: "Test", shiftID: nil, context: context)
-        let oldArchive = try HopeBackupService.snapshot(context: context)
-        _ = try TaskImportService.commit(pending, drafts: pending.drafts(), shiftID: nil, context: context)
-        _ = try HopeBackupService.merge(oldArchive, context: context, updateLibraryPreference: false)
-        XCTAssertEqual(try context.fetchCount(FetchDescriptor<PendingTaskImport>()), 0)
-        XCTAssertEqual(try context.fetchCount(FetchDescriptor<TaskItem>()), 1)
+    func testOldBackupWithRemovedImportsKeyStillDecodes() throws {
+        let json = #"{"app":"Hope","schemaVersion":1,"exportedAt":0,"tasks":[],"shifts":[],"routines":[],"imports":[{"id":"x"}]}"#
+        let archive = try HopeBackup.decode(Data(json.utf8))
+        XCTAssertTrue(archive.tasks.isEmpty)
+    }
+    func testBackupCarriesGardenDataAndMergesWithoutDuplicates() throws {
+        let source = try context()
+        let mood = MoodCheckIn(mood: .tired); let visit = HealingVisit(kind: .rest, minutes: 5)
+        let entry = JournalEntry(kind: .free, prompt: "Hôm nay", text: "Một ngày dài")
+        source.insert(mood); source.insert(visit); source.insert(entry); try source.save()
+        let archive = try HopeBackup.decode(HopeBackupService.snapshot(context: source).encoded())
+        XCTAssertEqual(archive.moods?.count, 1); XCTAssertEqual(archive.journal?.first?.text, "Một ngày dài"); XCTAssertEqual(archive.visits?.first?.minutes, 5)
+        let target = try context()
+        _ = try HopeBackupService.merge(archive, context: target, updateLibraryPreference: false)
+        _ = try HopeBackupService.merge(archive, context: target, updateLibraryPreference: false)
+        XCTAssertEqual(try target.fetchCount(FetchDescriptor<MoodCheckIn>()), 1)
+        XCTAssertEqual(try target.fetchCount(FetchDescriptor<JournalEntry>()), 1)
+        XCTAssertEqual(try target.fetchCount(FetchDescriptor<HealingVisit>()), 1)
+        XCTAssertEqual(try XCTUnwrap(target.fetch(FetchDescriptor<JournalEntry>()).first).id, entry.id)
+    }
+    func testBackupCanLeaveGardenDataOut() throws {
+        let source = try context(); source.insert(JournalEntry(kind: .free, prompt: "", text: "Riêng tư")); try source.save()
+        let archive = try HopeBackupService.snapshot(context: source, includeGarden: false)
+        XCTAssertNil(archive.journal)
+        XCTAssertFalse(String(decoding: try archive.encoded(), as: UTF8.self).contains("Riêng tư"))
+    }
+    func testInvalidGardenRecordsAreRejectedBeforeAnyInsert() throws {
+        let source = try context(); source.insert(MoodCheckIn(mood: .okay)); try source.save()
+        var archive = try HopeBackupService.snapshot(context: source)
+        archive.moods?[0].moodRaw = "khong-co"
+        let target = try context()
+        XCTAssertThrowsError(try HopeBackupService.merge(archive, context: target, updateLibraryPreference: false))
+        XCTAssertEqual(try target.fetchCount(FetchDescriptor<MoodCheckIn>()), 0)
+    }
+    func testOldBackupWithoutGardenKeysStillDecodes() throws {
+        let json = #"{"app":"Hope","schemaVersion":1,"exportedAt":0,"tasks":[],"shifts":[],"routines":[]}"#
+        let archive = try HopeBackup.decode(Data(json.utf8))
+        XCTAssertNil(archive.journal)
     }
 }

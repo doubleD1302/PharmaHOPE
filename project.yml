@@ -21,13 +21,14 @@ targets:
       - path: PharmaTask/Features
       - path: PharmaTask/Shared
       - path: PharmaTask/Resources
+        excludes:
+          - "GardenCreatures/**"
     info:
       path: PharmaTask/Info.plist
     entitlements:
       path: PharmaTask/PharmaTask.entitlements
     dependencies:
       - target: HopeWidgets
-      - target: HopeShare
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.hope.app
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -46,21 +47,6 @@ targets:
       path: PharmaTaskWidgets/PharmaTaskWidgets.entitlements
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.hope.app.widgets
-      DEVELOPMENT_TEAM: ""
-
-  HopeShare:
-    type: app-extension
-    platform: iOS
-    deploymentTarget: "17.0"
-    sources:
-      - path: PharmaTaskShare
-      - path: PharmaTask/Shared
-    info:
-      path: PharmaTaskShare/Info.plist
-    entitlements:
-      path: PharmaTaskShare/PharmaTaskShare.entitlements
-    settings:
-      PRODUCT_BUNDLE_IDENTIFIER: com.hope.app.share
       DEVELOPMENT_TEAM: ""
 
   HopeTests:

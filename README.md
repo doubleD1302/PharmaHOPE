@@ -1,23 +1,23 @@
 # Hope
 
-Ứng dụng quản lý công việc và ca trực nhà thuốc. Bản native sử dụng SwiftUI, SwiftData và yêu cầu iOS 17 trở lên. Thư mục `../PharmaTask_Simulator` là bản mô phỏng web, không kết nối trực tiếp Zalo và không gọi Gemini.
+Ứng dụng quản lý công việc và ca trực nhà thuốc. Bản native sử dụng SwiftUI, SwiftData và yêu cầu iOS 17 trở lên. Thư mục `../PharmaTask_Simulator` là bản mô phỏng web, không gọi Gemini và chưa có tab Vườn; phần mô phỏng Zalo trong đó là bản cũ, bản native đã gỡ tính năng này.
 
 Giao diện native đã chuyển sang bộ thiết kế Hope / Quiet Care: nền ngà, xanh ngọc, màu sáng/tối, asset vector và font hệ thống. Xem `DesignAssets/README.txt` cùng `../review/redesign/design-reference.png`. Ảnh này là tài liệu thiết kế, chưa phải ảnh render từ app iOS. Các Native Preview nằm trong `HopeDashboardPreviews.swift`.
 
 ## Tính năng dùng cá nhân
 
 - Nhấn giữ việc → Chỉnh sửa để đổi tên, ghi chú, ưu tiên, ngày/giờ hạn và nhắc trước hạn. Xóa có Hoàn tác; tab Tra cứu → bộ lọc Đã xóa cho phép khôi phục lại.
-- Zalo/Shortcuts/Chia sẻ chỉ tạo bản nháp. Mở thẻ Chờ duyệt AI hoặc Cài đặt → Bản nháp AI chờ duyệt, so sánh tin nhắn gốc, sửa/bỏ chọn từng dòng rồi lưu. Để sau giữ lại chỉnh sửa của bản nháp.
+- Tab **Vườn**: chọn cảm xúc, nghỉ 1-3 phút theo nhịp thở, viết nhật ký riêng, nghe âm thanh tạo trên máy (mưa, lá, suối, quán cà phê, hẹn giờ tắt), lời dành cho bạn, khép lại hôm nay, cây và Hope lớn dần theo số ngày bạn ghé nghỉ. Không có chỉ tiêu hay chuỗi ngày.
 - Cài đặt → Checklist theo loại ca để thêm, sửa, tắt, xóa và sắp thứ tự mẫu. Chọn loại checklist trong form ca. Mẫu được sao chép khi bắt đầu ca lần đầu; mỗi ca có trạng thái hoàn thành riêng.
 - Nhắc trước hạn, đúng hạn và một lần sau 15 phút quá hạn. Nhấn giữ việc hoặc dùng nút trong thông báo để hoãn 10/15 phút. Việc trong ca ngừng được nhắc sau giờ kết thúc; việc chưa gắn ca nhắc độc lập. Lịch ưu tiên tối đa 60 sự kiện gần nhất, không lặp vô hạn.
 - Tab Tra cứu tìm không phân biệt hoa/thường và dấu tiếng Việt, lọc trạng thái/ưu tiên/ca/khoảng ngày tạo việc. Việc quá hạn cập nhật theo phút khi xem.
 - Cài đặt → Sao lưu và khôi phục xuất/nhập JSON qua ứng dụng Tệp. Xem nội dung trước khi nhập; ghép theo ID và giữ bản có `updatedAt` mới hơn, không xóa dữ liệu ngoài tệp. Ca được thêm từ bản sao lưu chưa tự bắt đầu. Cấu hình API Key không được xuất.
 
-Định dạng sao lưu hiện tại: `app=Hope`, `schemaVersion=1`, ngày là số mili giây từ Unix epoch; có công việc, ca, mẫu checklist, bản nháp và tin nhắn nguồn. Giới hạn tệp 10 MB. Chưa có đồng bộ tài khoản qua mạng.
+Định dạng sao lưu hiện tại: `app=Hope`, `schemaVersion=1`, ngày là số mili giây từ Unix epoch; có công việc, ca, mẫu checklist và (tuỳ chọn, mặc định bật) cảm xúc, nhật ký, lượt ghé vườn; tệp cũ không có các khóa này vẫn đọc được, khóa `imports` của tệp cũ được bỏ qua. Tệp không mã hoá nên nhật ký nằm nguyên văn trong đó; có công tắc để không kèm. Giới hạn tệp 10 MB. Chưa có đồng bộ tài khoản qua mạng.
 
 Không có chức năng chuyển/bàn giao việc giữa người dùng. Các trường cũ được giữ để tương thích dữ liệu đã lưu.
 
-Đợt tính năng này có 25 XCTest trong `HopeTests` (17 bài mới), chưa chạy trên máy Windows. Kiểm tra tĩnh và các bước nghiệm thu iPhone nằm trong `../review/features/FEATURES.txt`. Cần kiểm tra nâng cấp cơ sở dữ liệu cũ trên bản sao trước khi dùng bản build với dữ liệu thật.
+Các XCTest nằm trong `HopeTests`; workflow `.github/workflows/ios-tests.yml` chạy chúng trên macOS. Cần kiểm tra nâng cấp cơ sở dữ liệu cũ trên bản sao trước khi dùng bản build với dữ liệu thật (schema đã bỏ PendingTaskImport và thêm MoodCheckIn, JournalEntry, HealingVisit).
 
 ## Chạy và kiểm tra bản web
 
@@ -41,21 +41,25 @@ WebKit trên Windows giúp kiểm tra bản web; kết quả không thay thế t
 
 1. Cài Xcode có SDK iOS 17 trở lên và XcodeGen.
 2. Chạy `xcodegen generate` trong thư mục này, rồi mở `Hope.xcodeproj`.
-3. Chọn team ký ứng dụng; bật App Group `group.com.pharmatask.app` cho cả Hope, HopeWidgets và HopeShare. Giữ cùng App Group để cả ba đọc chung cơ sở dữ liệu.
+3. Chọn team ký ứng dụng; bật App Group `group.com.pharmatask.app` cho cả Hope và HopeWidgets. Giữ cùng App Group để cả hai đọc chung cơ sở dữ liệu.
 4. Build scheme `Hope`; chạy `HopeTests` trên một iOS Simulator có sẵn. Ví dụ lệnh chỉ build:
 
 ```sh
 xcodebuild -project Hope.xcodeproj -scheme Hope -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
 ```
 
-Kiểm thử trên iPhone: bắt đầu/kết thúc ca, ca qua đêm, cỡ chữ lớn, VoiceOver, nhập tin nhắn/ảnh qua Share, thông báo và Live Activity khi app đóng. Các mục này chưa được xác minh trên thiết bị trong lần rà soát Windows.
+Kiểm thử trên iPhone: bắt đầu/kết thúc ca, ca qua đêm, cỡ chữ lớn, VoiceOver, thông báo và Live Activity khi app đóng. Các mục này chưa được xác minh trên thiết bị trong lần rà soát Windows.
 
-## Bóc tách Zalo
+## Vườn Hope và Gemini
 
-Nhập Gemini API Key cá nhân trong Cài đặt. Ứng dụng gửi nội dung bạn chọn tới Gemini để bóc tách; không đọc nhóm Zalo tự động. Khóa hiện được lưu bằng App Group UserDefaults. Cần chuyển sang Keychain trước khi phát hành rộng rãi.
+Nhập Gemini API Key trong Cài đặt; khóa nằm trong Keychain. Tab Vườn chạy đầy đủ khi không có khóa (dùng nội dung viết sẵn). Có khóa thì Gemini viết: lời dành cho bạn, lời nhắc thả lỏng, câu mở đầu nhật ký, gợi ý ghi nhận cuối ngày, câu Hope nói khi chạm vào, thư tuần và (chỉ khi bạn đồng ý từng lần) lời đáp cho một bài nhật ký.
 
-Sao chép tin nhắn rồi chạy intent **Bóc tách việc Zalo (Hope)** hoặc nút **Gọn việc từ Zalo**. Shortcuts cũng nhận văn bản hoặc ảnh đầu vào. Có thể gán phím tắt vào Chạm vào mặt lưng trong Trợ năng iPhone.
+Model được chọn tự động trong `GeminiClient.swift`: ứng dụng hỏi API danh sách model, ưu tiên Flash-Lite mới nhất (rẻ nhất), rồi Flash mới nhất, rồi các bí danh `-latest`, rồi các bản cố định. Danh sách được lưu 24 giờ; model bị gỡ hoặc hết hạn mức thì thử bản kế tiếp. Chỉ gửi tham số tối thiểu để chạy được trên mọi đời Gemini. Mặc định chỉ gửi cảm xúc đã chọn, buổi trong ngày hoặc số lượng; không gửi tên việc hay nhật ký.
+
+Âm thanh được tổng hợp ngay trên máy (`AmbientSoundEngine.swift`), nên không cần tải tệp và nghe được khi offline. Ảnh vườn nằm trong `PharmaTask/Resources/GardenAssets.xcassets`, lấy từ `DesignAssets/healing` và thu nhỏ.
 
 ## Android sau này
 
 SwiftUI, SwiftData, WidgetKit và Shortcuts là phần dành riêng iOS. Bản web hiện chỉ là mô phỏng. Khi làm Android, cần dùng lại quy tắc phân ca, định dạng công việc và bộ màu/chữ, rồi xây giao diện và tích hợp thông báo Android tương ứng; không coi web preview là app Android hoàn chỉnh.
+
+Nếu không mở được cơ sở dữ liệu (ví dụ nâng cấp schema lỗi), app không crash và không xoá gì: nó chạy bằng kho tạm trong bộ nhớ và hiện thông báo; tệp dữ liệu cũ giữ nguyên trên máy. Lời gọi Gemini có ngân sách thời gian tổng 15 giây, quá hạn thì dùng nội dung viết sẵn.

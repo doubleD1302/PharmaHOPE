@@ -8,10 +8,8 @@ import Observation
 @MainActor
 @Observable
 public final class ShiftDashboardViewModel {
-    public var isAnalyzingAI = false
     public var alertMessage: String?
     public var showAlert = false
-    public var importToReview: PendingTaskImport?
     @ObservationIgnored private var refreshTask: Task<Void, Never>?
     @ObservationIgnored private var needsRefresh = false
     @ObservationIgnored private var needsActivity = false
@@ -72,31 +70,6 @@ public final class ShiftDashboardViewModel {
             context.rollback()
             report(error)
             return false
-        }
-    }
-
-    public func processClipboard(context: ModelContext) {
-        guard !isAnalyzingAI else { return }
-        guard let text = UIPasteboard.general.string,
-              !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            alertMessage = "Hãy sao chép tin nhắn Zalo trước khi bóc tách."
-            showAlert = true
-            return
-        }
-        // Capture the intended shift before the network request can suspend.
-        let shiftID: String?
-        do { shiftID = try ShiftTaskSync.activeShift(in: context)?.id }
-        catch { report(error); return }
-        isAnalyzingAI = true
-        Task {
-            defer { isAnalyzingAI = false }
-            do {
-                let tasks = try await ZaloTaskExtractorService.shared.extractTasks(from: text)
-                importToReview = try TaskImportService.stage(tasks: tasks, source: text, label: "Clipboard Zalo", shiftID: shiftID, context: context)
-            } catch {
-                context.rollback()
-                report(error)
-            }
         }
     }
 

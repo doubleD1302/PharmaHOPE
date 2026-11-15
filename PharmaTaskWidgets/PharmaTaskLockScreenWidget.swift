@@ -65,12 +65,15 @@ struct PharmaTaskLockScreenWidgetEntryView: View {
     var body: some View {
         switch family {
         case .accessoryCircular:
-            Button(intent: ExtractZaloTaskIntent()) {
-                ZStack {
-                    AccessoryWidgetBackground()
-                    Image(systemName: "text.viewfinder").font(.title2)
+            ZStack {
+                AccessoryWidgetBackground()
+                VStack(spacing: 1) {
+                    Image(systemName: "leaf.fill").font(.caption)
+                    Text("\(entry.completedCount)/\(entry.totalCount)").font(.caption2.monospacedDigit())
                 }
-            }.buttonStyle(.plain).accessibilityLabel("Bóc tách tin nhắn Zalo trong Hope")
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Hope: \(entry.completedCount) trên \(entry.totalCount) việc hoàn thành")
         case .accessoryRectangular:
             VStack(alignment: .leading, spacing: 3) {
                 HStack {

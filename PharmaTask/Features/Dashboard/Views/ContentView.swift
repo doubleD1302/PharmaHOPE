@@ -6,20 +6,28 @@ public struct ContentView: View {
     @Query(filter: #Predicate<ShiftConfig> { $0.isActive }, sort: \ShiftConfig.startTime, order: .reverse)
     private var activeShifts: [ShiftConfig]
     @State private var selectedTab = 0
+    @State private var showingStoreProblem = SharedModelContainer.isRunningOnTemporaryStore
     public init() {}
 
     public var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                HopeDashboardView(shift: activeShifts.first) { selectedTab = 1 }
+                HopeDashboardView(shift: activeShifts.first, openSchedule: { selectedTab = 1 }, openGarden: { selectedTab = 3 })
             }
             .tabItem { Label("Hôm nay", systemImage: "checkmark.circle") }.tag(0)
             ShiftManagementView()
                 .tabItem { Label("Lịch ca", systemImage: "calendar") }.tag(1)
             TaskHistoryView()
                 .tabItem { Label("Tra cứu", systemImage: "magnifyingglass") }.tag(2)
+            HealingGardenView(isActive: selectedTab == 3)
+                .tabItem { Label("Hope", systemImage: "leaf") }.tag(3)
         }
         .tint(HopeTheme.accent)
+        .alert("Chưa mở được dữ liệu của bạn", isPresented: $showingStoreProblem) {
+            Button("Đã hiểu", role: .cancel) {}
+        } message: {
+            Text("Dữ liệu cũ vẫn còn nguyên trên máy, Hope chưa xoá gì. Lúc này Hope đang dùng kho tạm nên việc bạn thêm sẽ mất khi đóng app. Hãy cập nhật Hope lên bản mới nhất rồi mở lại.")
+        }
     }
 }
 
@@ -30,7 +38,6 @@ private struct HopeDashboardView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
     @Query private var tasks: [TaskItem]
-    @State private var pendingImports: [PendingTaskImport] = []
     @State private var viewModel = ShiftDashboardViewModel()
     @State private var draft = ""
     @State private var showingSettings = false
@@ -42,10 +49,12 @@ private struct HopeDashboardView: View {
     @FocusState private var composerFocused: Bool
     let shift: ShiftConfig?
     let openSchedule: () -> Void
+    let openGarden: () -> Void
 
-    init(shift: ShiftConfig?, openSchedule: @escaping () -> Void) {
+    init(shift: ShiftConfig?, openSchedule: @escaping () -> Void, openGarden: @escaping () -> Void) {
         self.shift = shift
         self.openSchedule = openSchedule
+        self.openGarden = openGarden
         let shiftID = shift?.id
         _tasks = Query(filter: #Predicate<TaskItem> { $0.shiftId == shiftID && $0.deletedAt == nil },
                        sort: [SortDescriptor(\TaskItem.createdAt, order: .reverse)])
@@ -57,15 +66,7 @@ private struct HopeDashboardView: View {
             LazyVStack(alignment: .leading, spacing: 24) {
                 greeting
                 shiftCard(snapshot)
-                extractionShortcut
-                if let pending = pendingImports.first {
-                    Button { viewModel.importToReview = pending } label: {
-                        Label("\(pendingImports.count) bản nháp AI chờ duyệt", systemImage: "tray.full")
-                            .font(.subheadline.weight(.semibold)).frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(16).background(HopeTheme.surfaceMuted, in: RoundedRectangle(cornerRadius: 18))
-                    }.buttonStyle(.plain).foregroundStyle(HopeTheme.accent)
-                    if pendingImports.count > 1 { NavigationLink("Xem tất cả bản nháp") { ImportInboxView() } }
-                }
+                gardenShortcut
                 if snapshot.total == 0 {
                     emptyState
                 } else {
@@ -122,19 +123,12 @@ private struct HopeDashboardView: View {
                 }.accessibilityLabel("Cài đặt")
             }
         }
-        .sheet(isPresented: $showingSettings, onDismiss: loadPendingImports) { SettingsView() }
+        .sheet(isPresented: $showingSettings) { SettingsView() }
         .sheet(item: $editingTask) { task in
             TaskEditorView(task: task, onSaved: { viewModel.refresh(context: context) }, onDeleted: {
                 lastDeleted = task; viewModel.refresh(context: context)
             })
         }
-        .sheet(item: Binding(get: {
-            showingSettings || editingTask != nil ? nil : viewModel.importToReview
-        }, set: { viewModel.importToReview = $0 })) { pending in
-            ImportReviewView(pending: pending) { viewModel.importToReview = nil; loadPendingImports(); viewModel.refresh(context: context) }
-        }
-        .onChange(of: viewModel.importToReview?.id) { _, _ in loadPendingImports() }
-        .onAppear(perform: loadPendingImports)
         .safeAreaInset(edge: .top, spacing: 0) {
             if let task = lastDeleted {
                 HStack {
@@ -229,19 +223,15 @@ private struct HopeDashboardView: View {
             .font(.caption).foregroundStyle(HopeTheme.mint)
     }
 
-    private var extractionShortcut: some View {
-        Button { composerFocused = false; viewModel.processClipboard(context: context) } label: {
+    private var gardenShortcut: some View {
+        Button { composerFocused = false; openGarden() } label: {
             HStack(spacing: 14) {
-                Group {
-                    if viewModel.isAnalyzingAI { ProgressView().tint(HopeTheme.accent) }
-                    else { Image(systemName: "text.viewfinder").font(.title2) }
-                }
-                .frame(width: 44, height: 44).foregroundStyle(HopeTheme.accent)
-                .background(HopeTheme.surface, in: RoundedRectangle(cornerRadius: 14))
+                Image(systemName: "leaf").font(.title2)
+                    .frame(width: 44, height: 44).foregroundStyle(HopeTheme.accent)
+                    .background(HopeTheme.surface, in: RoundedRectangle(cornerRadius: 14))
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(viewModel.isAnalyzingAI ? "Đang bóc tách…" : "Gọn việc từ Zalo")
-                        .font(.headline).foregroundStyle(HopeTheme.ink)
-                    Text(viewModel.isAnalyzingAI ? "Bạn có thể tiếp tục xem công việc." : "Bóc tách rồi duyệt trước khi lưu.")
+                    Text("Nghỉ một chút").font(.headline).foregroundStyle(HopeTheme.ink)
+                    Text("Ghé khu vườn Hope, vài phút cho riêng bạn.")
                         .font(.subheadline).foregroundStyle(HopeTheme.secondary)
                 }.frame(maxWidth: .infinity, alignment: .leading)
                 if !typeSize.isAccessibilitySize {
@@ -251,15 +241,15 @@ private struct HopeDashboardView: View {
             .padding(16).background(HopeTheme.surfaceMuted, in: RoundedRectangle(cornerRadius: 22))
             .contentShape(RoundedRectangle(cornerRadius: 22))
         }
-        .buttonStyle(.plain).disabled(viewModel.isAnalyzingAI)
-        .accessibilityHint("Gửi tin nhắn đã sao chép đến Gemini để trích xuất công việc")
+        .buttonStyle(.plain)
+        .accessibilityHint("Mở tab Vườn để nghỉ ngơi")
     }
 
     private var emptyState: some View {
         VStack(spacing: 12) {
             HopeIllustration("HopeInbox", width: 150)
             Text("Để đầu óc nhẹ hơn.").font(.title3.weight(.semibold)).foregroundStyle(HopeTheme.ink)
-            Text("Thêm việc bên dưới hoặc bóc tách tin nhắn Zalo để bắt đầu.")
+            Text("Thêm việc ở khung bên dưới để bắt đầu.")
                 .font(.subheadline).foregroundStyle(HopeTheme.secondary).multilineTextAlignment(.center)
         }
         .padding(.vertical, 12).frame(maxWidth: .infinity)
@@ -292,7 +282,6 @@ private struct HopeDashboardView: View {
     }
 
     private func refreshIfRunning() {
-        loadPendingImports()
         if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" {
             viewModel.refresh(context: context, startActivity: true)
             let defaults = UserDefaults(suiteName: SharedModelContainer.appGroupID)
@@ -301,11 +290,6 @@ private struct HopeDashboardView: View {
                 viewModel.report(HopeDataError.invalid(message))
             }
         }
-    }
-    private func loadPendingImports() {
-        do {
-            pendingImports = try context.fetch(FetchDescriptor<PendingTaskImport>(sortBy: [SortDescriptor(\PendingTaskImport.createdAt, order: .reverse)]))
-        } catch { viewModel.report(error) }
     }
 
     @ViewBuilder private func taskActions(_ task: TaskItem) -> some View {

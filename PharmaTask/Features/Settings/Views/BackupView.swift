@@ -20,6 +20,7 @@ struct BackupView: View {
     @State private var importing = false
     @State private var document: HopeBackupDocument?
     @State private var preview: HopeBackup?
+    @State private var includeGarden = true
     @State private var busy = false
     @State private var message: String?
     @State private var viewModel = ShiftDashboardViewModel()
@@ -29,7 +30,10 @@ struct BackupView: View {
                 Button(action: export) { Label("Xuất bản sao lưu JSON", systemImage: "square.and.arrow.up") }.disabled(busy)
                 Button { importing = true } label: { Label("Chọn tệp để khôi phục", systemImage: "square.and.arrow.down") }.disabled(busy)
             } footer: {
-                Text("Tệp chứa công việc, ca, checklist và bản nháp cùng tin nhắn gốc; không xuất khóa API trong Cài đặt. Bạn tự chọn nơi lưu trong Tệp.")
+                Text("Tệp chứa công việc, ca và checklist; không xuất khóa API trong Cài đặt. Bạn tự chọn nơi lưu trong Tệp. Tệp không được mã hoá: nếu bật mục dưới đây, nhật ký sẽ nằm nguyên văn trong tệp.")
+            }
+            Section {
+                Toggle("Kèm cảm xúc, nhật ký và lượt ghé vườn", isOn: $includeGarden).disabled(busy)
             }
             if busy { Section { ProgressView("Đang xử lý dữ liệu…") } }
             if let archive = preview {
@@ -37,7 +41,9 @@ struct BackupView: View {
                     LabeledContent("Công việc", value: archive.tasks.count.formatted())
                     LabeledContent("Ca trực", value: archive.shifts.count.formatted())
                     LabeledContent("Mẫu checklist", value: archive.routines.count.formatted())
-                    LabeledContent("Bản nháp AI", value: archive.imports.count.formatted())
+                    LabeledContent("Cảm xúc đã chọn", value: (archive.moods?.count ?? 0).formatted())
+                    LabeledContent("Bài nhật ký", value: (archive.journal?.count ?? 0).formatted())
+                    LabeledContent("Lượt ghé vườn", value: (archive.visits?.count ?? 0).formatted())
                     Text("Khôi phục bằng cách ghép theo ID, giữ bản mới hơn trên máy. Ca được thêm từ tệp sẽ chưa bắt đầu.")
                         .font(.subheadline).foregroundStyle(HopeTheme.secondary)
                     Button("Khôi phục từ tệp này", action: restore).disabled(busy)
@@ -77,7 +83,7 @@ struct BackupView: View {
         Task {
             defer { busy = false }
             do {
-                let archive = try HopeBackupService.snapshot(context: context)
+                let archive = try HopeBackupService.snapshot(context: context, includeGarden: includeGarden)
                 let data = try await Task.detached { try archive.encoded() }.value
                 document = HopeBackupDocument(data: data); exporting = true; message = nil
             } catch { message = error.localizedDescription }

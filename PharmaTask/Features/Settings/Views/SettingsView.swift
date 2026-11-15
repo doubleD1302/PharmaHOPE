@@ -5,9 +5,9 @@ import UserNotifications
 public struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
-    @AppStorage("GEMINI_API_KEY", store: UserDefaults(suiteName: SharedModelContainer.appGroupID))
-    private var apiKey = ""
+    @State private var hasKey = GeminiKeyStore.hasKey
     @State private var draftKey = ""
+    @State private var keySaveFailed = false
     @State private var notificationsAllowed = false
     public init() {}
 
@@ -26,35 +26,23 @@ public struct SettingsView: View {
                 }.listRowBackground(HopeTheme.surface)
 
                 Section {
-                    Label(apiKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Chưa kết nối Gemini" : "Đã thêm khóa Gemini",
-                          systemImage: "sparkles")
+                    Label(hasKey ? "Đã thêm khóa Gemini" : "Chưa kết nối Gemini", systemImage: "sparkles")
                         .foregroundStyle(HopeTheme.accent)
-                    SecureField("Gemini API Key", text: $draftKey)
+                    SecureField(hasKey ? "Nhập khóa mới để thay thế" : "Gemini API Key", text: $draftKey)
                         .font(.body).textInputAutocapitalization(.never).autocorrectionDisabled()
                         .accessibilityLabel("Khóa API Gemini cá nhân")
-                } header: { Text("Trợ lý cho ca làm") } footer: {
-                    Text("Khi bạn chọn bóc tách, nội dung tin nhắn được gửi đến Gemini. Chỉ chọn những thông tin bạn muốn chia sẻ.")
+                    if hasKey {
+                        Button("Xóa khóa khỏi máy", role: .destructive) {
+                            GeminiKeyStore.remove(); hasKey = false; draftKey = ""
+                        }
+                    }
+                } header: { Text("Lời nhắn cho khu vườn") } footer: {
+                    Text("Khóa được lưu trong Keychain của iPhone. Hope dùng Gemini cho lời nhắn, lời nhắc nghỉ, câu mở đầu nhật ký, thư tuần và lời của Hope. Mặc định chỉ cảm xúc bạn chọn, buổi trong ngày hoặc số lượng việc được gửi đi, không gửi tên việc. Bài nhật ký chỉ được gửi khi bạn tự bấm nghe lời đáp và đồng ý. Không có khóa hoặc không có mạng, Hope dùng nội dung viết sẵn.")
                 }
                 .listRowBackground(HopeTheme.surface)
 
                 Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Từ tin nhắn thành đầu việc", systemImage: "text.viewfinder")
-                            .font(.headline).foregroundStyle(HopeTheme.ink)
-                        Text("Sao chép nội dung Zalo, quay về Hope và chọn Gọn việc từ Zalo. Bạn cũng có thể gửi văn bản hoặc ảnh qua menu Chia sẻ. Duyệt và sửa bản nháp trước khi lưu công việc.")
-                            .font(.subheadline).foregroundStyle(HopeTheme.secondary)
-                        Divider()
-                        Label("Thêm vào Phím tắt", systemImage: "square.stack.3d.up")
-                            .font(.subheadline.weight(.semibold)).foregroundStyle(HopeTheme.ink)
-                        Text("Gán Bóc tách việc Zalo vào Chạm vào mặt lưng trong Trợ năng để mở nhanh khi cần.")
-                            .font(.subheadline).foregroundStyle(HopeTheme.secondary)
-                    }.padding(.vertical, 6)
-                } header: { Text("Một chút tiện hơn") }
-                .listRowBackground(HopeTheme.surface)
-
-                Section {
                     NavigationLink { RoutineLibraryView() } label: { Label("Checklist theo loại ca", systemImage: "checklist") }
-                    NavigationLink { ImportInboxView() } label: { Label("Bản nháp AI chờ duyệt", systemImage: "tray") }
                     NavigationLink { BackupView() } label: { Label("Sao lưu và khôi phục", systemImage: "externaldrive") }
                 } header: { Text("Dữ liệu của bạn") }
                 .listRowBackground(HopeTheme.surface)
@@ -83,13 +71,19 @@ public struct SettingsView: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Đóng") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Lưu") {
-                        apiKey = draftKey.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let key = draftKey.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !key.isEmpty && !GeminiKeyStore.save(key) {
+                            keySaveFailed = true
+                            return
+                        }
                         dismiss()
                     }.fontWeight(.semibold)
                 }
             }
             .tint(HopeTheme.accent)
-            .onAppear { draftKey = apiKey }
+            .alert("Chưa lưu được khóa", isPresented: $keySaveFailed) {
+                Button("Đóng", role: .cancel) {}
+            } message: { Text("iPhone không cho lưu khóa vào Keychain lúc này. Hãy thử lại sau.") }
             .task { await updateNotificationPermission() }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await updateNotificationPermission() } }
