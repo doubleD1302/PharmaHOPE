@@ -30,8 +30,12 @@ final class HopeAppDelegate: NSObject, UIApplicationDelegate, UNUserNotification
                 case NotificationScheduler.completeAction:
                     try TaskCommands.complete(task, completed: true, context: context)
                 case NotificationScheduler.snooze10Action, NotificationScheduler.snooze15Action:
-                    let shiftID = task.shiftId
-                    let shift = try context.fetch(FetchDescriptor<ShiftConfig>(predicate: #Predicate { $0.id == shiftID })).first
+                    let shift: ShiftConfig?
+                    if let shiftID = task.shiftId {
+                        shift = try context.fetch(FetchDescriptor<ShiftConfig>(predicate: #Predicate { $0.id == shiftID })).first
+                    } else {
+                        shift = nil
+                    }
                     try TaskCommands.snooze(task, minutes: action == NotificationScheduler.snooze10Action ? 10 : 15, shift: shift, context: context)
                 default: return
                 }

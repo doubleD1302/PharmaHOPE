@@ -71,7 +71,7 @@ public actor GeminiClient {
     private let lastGoodKey = "gemini.lastGoodModel"
     private let maximumAttempts = 4
     /// Tổng thời gian tối đa cho một lần xin nội dung (gồm lấy danh sách model). Quá hạn thì dùng nội dung viết sẵn.
-    static let totalBudget: TimeInterval = 15
+    public static let totalBudget: TimeInterval = 15
 
     public init(session: URLSession = .shared) { self.session = session }
 

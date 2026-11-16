@@ -181,8 +181,12 @@ struct HopeAlertsView: View {
             query.fetchLimit = 1
             guard let task = try context.fetch(query).first else { return }
             if let minutes {
-                let shiftID = task.shiftId
-                let shift = try context.fetch(FetchDescriptor<ShiftConfig>(predicate: #Predicate { $0.id == shiftID })).first
+                let shift: ShiftConfig?
+                if let shiftID = task.shiftId {
+                    shift = try context.fetch(FetchDescriptor<ShiftConfig>(predicate: #Predicate { $0.id == shiftID })).first
+                } else {
+                    shift = nil
+                }
                 try TaskCommands.snooze(task, minutes: minutes, shift: shift, context: context)
             } else {
                 try TaskCommands.complete(task, completed: true, context: context)
