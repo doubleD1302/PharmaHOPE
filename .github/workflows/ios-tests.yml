@@ -62,6 +62,14 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             | tee build/xcodebuild.log
 
+      - name: Report build errors
+        if: failure()
+        run: |
+          # In các dòng lỗi thành chú thích của lần chạy để đọc được mà không cần mở log.
+          grep -E "error:" build/xcodebuild.log | sed -E 's#^.*/work/[^/]*/[^/]*/##' | sort -u | head -n 10 | while IFS= read -r line; do
+            echo "::error::${line:0:400}"
+          done || true
+
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4

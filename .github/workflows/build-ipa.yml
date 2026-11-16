@@ -28,6 +28,8 @@ jobs:
 
       - name: Build Archive
         run: |
+          set -o pipefail
+          mkdir -p build
           xcodebuild archive \
             -project Hope.xcodeproj \
             -scheme Hope \
@@ -37,7 +39,16 @@ jobs:
             GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
+            CODE_SIGN_IDENTITY="" \
+            | tee build/xcodebuild.log
+
+      - name: Report build errors
+        if: failure()
+        run: |
+          # In các dòng lỗi thành chú thích của lần chạy để đọc được mà không cần mở log.
+          grep -E "error:" build/xcodebuild.log | sed -E 's#^.*/work/[^/]*/[^/]*/##' | sort -u | head -n 10 | while IFS= read -r line; do
+            echo "::error::${line:0:400}"
+          done || true
 
       - name: Package into IPA
         run: |
