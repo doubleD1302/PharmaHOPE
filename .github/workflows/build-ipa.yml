@@ -7,14 +7,18 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Select Xcode Version
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+        run: |
+          # Image macos-14 đã ngừng hỗ trợ; dùng bản Xcode ổn định mới nhất có trên máy chạy.
+          XCODE=$(ls -d /Applications/Xcode_*.app 2>/dev/null | grep -vi beta | sort -V | tail -n 1)
+          if [ -n "$XCODE" ]; then sudo xcode-select -s "$XCODE/Contents/Developer"; fi
+          xcodebuild -version
 
       - name: Install XcodeGen
         run: brew install xcodegen
